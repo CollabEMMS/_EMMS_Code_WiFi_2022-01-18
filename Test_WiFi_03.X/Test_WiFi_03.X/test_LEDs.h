@@ -1,0 +1,18 @@
+#ifndef TEST_LEDS_H
+#define	TEST_LEDS_H
+
+#define LED1DIR TRISBbits.TRISB9
+#define LED2DIR TRISBbits.TRISB14
+#define LED3DIR TRISBbits.TRISB8
+
+#define LED1SET LATBbits.LATB9
+#define LED2SET LATBbits.LATB14
+#define LED3SET LATBbits.LATB8
+
+#define LED1READ PORTBbits.RB9
+#define LED2READ PORTBbits.RB14
+#define LED3READ PORTBbits.RB8
+
+
+#endif	/* XC_HEADER_TEMPLATE_H */
+

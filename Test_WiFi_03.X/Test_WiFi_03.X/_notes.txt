@@ -1,0 +1,12 @@
+Some notes on the current implementation:
+
+The WiFi receive checking is not robust
+a '!' must be at the start of the buffer when a '*' is received.
+a '*' will cause the buffer to be reset
+the command board sends a '#' before the '!' to help make sure comm is working right
+change the command board to send a '*' and things start to work well
+this causes the WiFi to clear the buffer right before the '!' is sent
+this should be cleaned up with more robust code to look for '!' before starting to buffer
+many other places in code look for '!' before starting to buffer, so this should be easy
+
+

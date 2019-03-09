@@ -14,3 +14,7 @@ Needs To Be Changed:
 	- Pad Size?
 	- General Drill Size
 	- Need to change holes for 3.3v regulator because holes are too small
+	- Add silkscreen for DIP switch positions
+	- Add silkscreen for SPI header orientation
+	- Change hole size for SPI header / all headers 
+

@@ -7,8 +7,9 @@ last edit date: 3/7/2019
 v1.0
 
 Version History:
-	v1.0: Initial Prototype
-	v1.1: 
+	v1.0: 	Initial Prototype
+	v1.1:	Changed Voltage Regulator SCH symbol and footprint
+		Changed SPI connector and PICKit connector symbols and footprints
 
 
 
@@ -19,5 +20,9 @@ Needs To Be Changed:
 		DONE
 	- Add silkscreen for DIP switch positions
 	- Add silkscreen for SPI header orientation
-	- Change hole size for SPI header / all headers 
+		DONE
+	- Change SCH symbol for headers and connectors
+		DONE
+	- Add Silkscreen labels to new header footprints
+
 

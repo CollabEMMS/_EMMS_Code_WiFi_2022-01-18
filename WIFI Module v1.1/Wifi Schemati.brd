@@ -102,6 +102,7 @@
 <vertex x="46.38700625" y="-22.70963125"/>
 <vertex x="45.870878125" y="-22.70963125"/>
 </polygon>
+<rectangle x1="63.290196875" y1="-0.58064375" x2="64.709546875" y2="15.741903125" layer="25"/>
 </plain>
 <libraries>
 <library name="wirepad" urn="urn:adsk.eagle:library:412">

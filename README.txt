@@ -24,5 +24,7 @@ Needs To Be Changed:
 	- Change SCH symbol for headers and connectors
 		DONE
 	- Add Silkscreen labels to new header footprints
+	- Add 12V pin on SPI
+	- 
 
 

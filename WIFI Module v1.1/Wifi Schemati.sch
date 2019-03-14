@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE eagle SYSTEM "eagle.dtd">
-<eagle version="9.2.2">
+<eagle version="9.3.0">
 <drawing>
 <settings>
 <setting alwaysvectorfont="no"/>
@@ -8541,26 +8541,10 @@ rectangle, 5.7 x 3.2 mm</description>
 <pad name="1" x="-5.08" y="-1.524" drill="0.999996875" shape="long" rot="R90"/>
 <pad name="2" x="-2.54" y="-1.524" drill="1" shape="long" rot="R90"/>
 <pad name="3" x="0" y="-1.524" drill="1" shape="long" rot="R90"/>
-<wire x1="-8.001" y1="-3.302" x2="-8.001" y2="1.778" width="0.1524" layer="51"/>
-<wire x1="-8.001" y1="1.778" x2="2.921" y2="1.778" width="0.1524" layer="51"/>
-<wire x1="2.921" y1="1.778" x2="2.921" y2="-3.302" width="0.1524" layer="51"/>
-<wire x1="2.921" y1="-3.302" x2="-8.001" y2="-3.302" width="0.1524" layer="51"/>
-<polygon width="0.1524" layer="51">
-<vertex x="-8.011" y="-3.3147"/>
-<vertex x="-8.011" y="1.7907"/>
-<vertex x="2.911" y="1.7907"/>
-<vertex x="2.911" y="-3.3147"/>
-</polygon>
 <wire x1="-6.604" y1="-3.2004" x2="1.524" y2="-3.2004" width="0.1524" layer="21"/>
 <wire x1="1.524" y1="-3.2004" x2="1.524" y2="1.6764" width="0.1524" layer="21"/>
 <wire x1="1.524" y1="1.6764" x2="-6.604" y2="1.6764" width="0.1524" layer="21"/>
 <wire x1="-6.604" y1="1.6764" x2="-6.604" y2="-3.2004" width="0.1524" layer="21"/>
-<wire x1="-5.3594" y1="-1.524" x2="-4.8514" y2="-1.524" width="0.1524" layer="51"/>
-<wire x1="-5.1054" y1="-1.778" x2="-5.1054" y2="-1.27" width="0.1524" layer="51"/>
-<wire x1="-7.747" y1="-3.048" x2="2.667" y2="-3.048" width="0.1524" layer="51"/>
-<wire x1="2.667" y1="-3.048" x2="2.667" y2="1.524" width="0.1524" layer="51"/>
-<wire x1="-7.0358" y1="-1.524" x2="-7.4422" y2="-1.524" width="0" layer="51" curve="-180"/>
-<wire x1="-7.4422" y1="-1.524" x2="-7.0358" y2="-1.524" width="0" layer="51" curve="-180"/>
 <text x="-7.0866" y="-0.127" size="1.27" layer="25" ratio="6" rot="SR0">&gt;Name</text>
 <rectangle x1="-6.604" y1="0.889" x2="1.524" y2="1.651" layer="21"/>
 </package>

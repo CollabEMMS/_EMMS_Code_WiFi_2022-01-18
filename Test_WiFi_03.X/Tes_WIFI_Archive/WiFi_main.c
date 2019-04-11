@@ -115,61 +115,67 @@ int main( int argc, char** argv )
 {
     ANSBbits.ANSB14 = 0;
     ANSBbits.ANSB15 = 0;
-
+    
+    
+// INITIAL START UP LED SEQUENCE
     LED1DIR = 0;
     LED2DIR = 0;
     LED3DIR = 0;
-
-    LED1SET = 0;
-    LED2SET = 0;
-    LED3SET = 0;
-
-
-
-    __delay_ms( 1000 );
-    for( int inx = 0; inx < 5; inx++ )
-    {
-	if( LED1READ == 0 )
-	{
-	    LED1SET = 1;
-	}
-	else
-	{
-	    LED1SET = 0;
-	}
-	__delay_ms( 500 );
-    }
-    init( );
-
-    wifi( true );
-    spi(true);
-
-
-    for( int inx = 0; inx < 10; inx++ )
-    {
-	if( LED1READ == 0 )
-	{
-	    LED1SET = 1;
-	}
-	else
-	{
-	    LED1SET = 0;
-	}
-	__delay_ms( 100 );
-    }
-
-    LED1SET = 0;
-    LED2SET = 0;
-
 
     LED1SET = 1;
     __delay_ms( 500 );
     LED2SET = 1;
     __delay_ms( 500 );
-    LED1SET = 0;
-    __delay_ms( 500 );
-    LED2SET = 0;
+    LED3SET = 1;
+    __delay_ms ( 500 );
 
+    for( int inx = 0; inx < 5; inx++ )
+    {
+	if( LED1READ == 0 )
+	{
+	    LED1SET = 1;
+        LED2SET = 1;
+        LED3SET = 1;
+	}
+	else
+	{
+	    LED1SET = 0;
+        LED2SET = 0;
+        LED3SET = 0;
+	}
+	__delay_ms( 100 );
+    }
+    LED1SET = 0;
+    LED2SET = 0;
+    LED3SET = 0;
+    
+//    END INITIAL LED SEQUENCE
+    
+    
+//    BEGIN INITIALIZATION    
+    init( );
+
+//    FLASHES FAST TO LET USER KNOW ITS INITIALIZED
+//    This should be to Show UART is ready to connect!
+    
+    for( int inx = 0; inx < 30; inx++ )
+    {
+	if( LED3READ == 0 )
+	{
+	    LED3SET = 1;
+	}
+	else
+	{
+	    LED3SET = 0;
+	}
+	__delay_ms( 30 );
+    }
+    
+    
+    
+    
+    wifi( true );
+    spi(true); 
 
     __delay_ms( 1000 );
 
@@ -213,6 +219,8 @@ int main( int argc, char** argv )
         
           
 	}
+    
+
 
 	//	if( timer_ms > (oldTimer + 1000) )
 	//	{

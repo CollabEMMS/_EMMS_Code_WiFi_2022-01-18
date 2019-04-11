@@ -132,17 +132,16 @@ void wifi( bool init )
 	bufRecvWiFi.posWrite = 0;
 	stage = 0;
 	wifiInit( );
-	spi( true );
     }
 
     wifiComm( );
-    spi( false );
 
     static bool runone = false;
 
     switch( stage )
     {
     case 0: // reset and init
+        
 	// set command
 	wifiCommandSet( "RST", true );
 	stage++;
@@ -156,7 +155,7 @@ void wifi( bool init )
 	break;
     case 2:
 	wifiCommandSet( "RFPOWER=82", true );
-	stage++;
+    stage++;
 	break;
     case 3:
 	if( wifiResponseCheck( "OK" ) == true )
@@ -165,8 +164,8 @@ void wifi( bool init )
 	}
 	break;
     case 4:
-	wifiCommandSet( "CWMODE_CUR=1", true );
-	stage++;
+        wifiCommandSet( "CWMODE_CUR=1", true );
+        stage++;
 	break;
     case 5:
 	if( wifiResponseCheck( "OK" ) == true )
@@ -176,7 +175,7 @@ void wifi( bool init )
 	break;
     case 6:
 	wifiCommandSet( "CWLAP", true );
-	//wifiCommandSet( "ATE0", false );
+    //wifiCommandSet( "ATE0", false );
 	stage++;
 	break;
     case 7:
@@ -188,7 +187,7 @@ void wifi( bool init )
     case 8:
 	wifiCommandSet( "CWJAP_CUR=\"mWiFi\",\"mahadaga\"", true );
 	wifiCommandSet( "CWJAP_CUR=\"AW2\",\"*****\"", true );
-	stage++;
+    stage++;
 	break;
     case 9:
 	if( wifiResponseCheck( "OK" ) == true )
@@ -198,7 +197,7 @@ void wifi( bool init )
 	break;
     case 10:
 	wifiCommandSet( "CIFSR", true );
-	stage++;
+    stage++;
 	break;
     case 11:
 	if( wifiResponseCheck( "OK" ) == true )
@@ -208,7 +207,7 @@ void wifi( bool init )
 	break;
     case 12:
 	wifiCommandSet( "CIPMUX=1", true );
-	stage++;
+    stage++;
 	break;
     case 13:
 	if( wifiResponseCheck( "OK" ) == true )
@@ -218,7 +217,7 @@ void wifi( bool init )
 	break;
     case 14:
 	wifiCommandSet( "CIPSERVER=0", true );
-	stage++;
+    stage++;
 	break;
     case 15:
 	if( wifiResponseCheck( "OK" ) == true )
@@ -228,7 +227,7 @@ void wifi( bool init )
 	break;
     case 16:
 	wifiCommandSet( "CIPSERVER=1,80", true );
-	stage++;
+    stage++;
 	break;
     case 17:
 	if( wifiResponseCheck( "OK" ) == true )
@@ -240,27 +239,97 @@ void wifi( bool init )
 	if( runone == false )
 	{
 	    //	    spiCommandSet( "\r\nConnected!*" );
-	    for( int inx = 0; inx < 40; inx++ )
-	    {
-		if( LED1READ == 0 )
-		{
-		    LED1SET = 1;
-		    LED2SET = 1;
-		}
-		else
-		{
-		    LED1SET = 0;
-		    LED2SET = 0;
-		}
-		__delay_ms( 10 );
-		runone = true;
-	    }
-	    LED1SET = 0;
-	    LED2SET = 0;
+//	    for( int inx = 0; inx < 40; inx++ )
+//	    {
+//		if( LED1READ == 0 )
+//		{
+//		    LED1SET = 1;
+//		    LED2SET = 1;
+//		}
+//		else
+//		{
+//		    LED1SET = 0;
+//		    LED2SET = 0;
+//		}
+//		__delay_ms( 10 );
+//		runone = true;
+//	    }
+//	    LED1SET = 0;
+//	    LED2SET = 0;
+	
+//    FLASHES FAST TO LET USER KNOW ITS INITIALIZED
+//    This should be to Show WIFI is ready to connect!
+    
+    for( int inx = 0; inx < 30; inx++ )
+    {
+	if( LED1READ == 0 )
+	{
+	    LED1SET = 1;
 	}
-	wifiServer( );
-	break;
+	else
+	{
+	    LED1SET = 0;
+	}
+	__delay_ms( 30 );
     }
+    LED1SET = 1;
+    LED3SET = 0;
+
+    // only do the light pulse once
+    runone = true;
+    }
+    wifiServer( );
+    stage++;
+    break;
+    case 19:
+    if( wifiResponseCheck( "WIFI DISCONNECT" ) == true )
+	{
+        // Means it Lost the Network
+        LED1SET = 0;
+        
+        U2TXREG = 'L';
+        __delay_ms( 50 );
+        U2TXREG = 'o';
+        __delay_ms( 50 );
+        U2TXREG = 's';
+        __delay_ms( 50 );
+        U2TXREG = 't';
+        __delay_ms( 50 );
+        U2TXREG = ' ';
+        __delay_ms( 50 );
+        U2TXREG = 'C';
+        __delay_ms( 50 );
+        U2TXREG = 'o';
+        __delay_ms( 50 );
+        U2TXREG = 'n';
+        __delay_ms( 50 );
+        U2TXREG = 'n';
+        __delay_ms( 50 );
+        U2TXREG = 'e';
+        __delay_ms( 50 );
+        U2TXREG = 'c';
+        __delay_ms( 50 );
+        U2TXREG = 't';
+        __delay_ms( 50 );
+        U2TXREG = 'i';
+        __delay_ms( 50 );
+        U2TXREG = 'o';
+        __delay_ms( 50 );
+        U2TXREG = 'n'; 
+        stage++;
+	}
+    break;
+    case 20:
+    if( wifiResponseCheck( "WIFI GOT IP" ) == true )
+	{
+        LED1SET = 1;
+        stage = 10;
+            
+            
+    }
+    }
+
+
 
     if( wifiResponseEnd( ) == true )
     {
@@ -347,14 +416,14 @@ void wifiServer( void )
 
 		    if( bufRecvWiFi.buf[bufRecvWiFi.posRead ] == '*' )
 		    {
-			if( LED2READ == 0 )
-			{
-			    LED2SET = 1;
-			}
-			else
-			{
-			    LED2SET = 0;
-			}
+//			if( LED2READ == 0 )
+//			{
+//			    LED2SET = 1;
+//			}
+//			else
+//			{
+//			    LED2SET = 0;
+//			}
 
 			bufRecvWiFiCommand[bufRecvWiFiCommandPos] = CHAR_NULL;
 			inCommand = false;
@@ -527,18 +596,6 @@ bool wifiResponseCheck( char* response )
 	}
     }
 
-    if( match == true )
-    {
-	if( LED1READ == 0 )
-	{
-	    LED1SET = 1;
-	}
-	else
-	{
-	    LED1SET = 0;
-	}
-    }
-
     return match;
 }
 
@@ -625,6 +682,16 @@ bool wifiCommSendChar( char data )
 		U1TXREG = data;
 		dataSent = true;
 		U2TXREG = data;
+        
+        // Flashes at UART Communication
+        if( LED3READ == 0 )
+		    {
+			LED3SET = 1;
+		    }
+		 else
+		    {
+			LED3SET = 0;
+		    }
 	    }
 	}
     }
@@ -646,7 +713,6 @@ bool wifiCommSendChar( char data )
 	    }
 	}
     }
-
     return dataSent;
 }
 
@@ -679,8 +745,17 @@ bool wifiCommRecvChar( char *data )
 	*data = U1RXREG;
 	dataReceived = true;
 	U2TXREG = *data;
+    
+    // Flashes at UART Communication
+    if( LED3READ == 0 )
+		    {
+			LED3SET = 1;
+		    }
+		 else
+		    {
+			LED3SET = 0;
+		    }
     }
-
     return dataReceived;
 }
 
@@ -718,12 +793,30 @@ void spi( bool init )
     U2TXREG = 'd';
 	__delay_ms( 10 );
     
-    LED3SET = 1;
-//    U2TXREG = '\n';
+    
+//    FLASHES FAST TO LET USER KNOW ITS INITIALIZED
+//    This should be first blink after Boot Sequence
+    
+    for( int inx = 0; inx < 30; inx++ )
+    {
+	if( LED2READ == 0 )
+	{
+	    LED2SET = 1;
+	}
+	else
+	{
+	    LED2SET = 0;
+	}
+	__delay_ms( 30 );
     }
+    
+    
+    } // END OF IF SPI(TRUE) condition
 
+    
+//    SPI initialization error control (?)
     static bool spiInReset = false;
-    if( PORTBbits.RB12 == 1 )
+    if( PORTBbits.RB15 == 1 ) // Set Chip Sel to input // Changed from rb12 (ss2) 
     {
 	if( spiInReset == false )
 	{
@@ -733,16 +826,15 @@ void spi( bool init )
     }
     else
     {
-	if( spiInReset == true )
+	if( spiInReset == true ) // One shot
 	{
-
 	    spiInReset = false;
 	    bufRecvSPI.posRead = 0;
 	    bufRecvSPI.posWrite = 0;
 	    // spiCommandSet( "!Set;Watts;55*" );
 	    SPI1STATbits.SPIEN = 1; //enable SPI
 	}
-
+// This is running every clock cycle
 	spiComm( );
 	spiServer( );
 
@@ -762,11 +854,11 @@ void spiServer( )
     // check the buffers and see if we have a command
     if( spiResponseEnd( ) == true )
     {
-        LED3SET = 1;
+//        LED3SET = 1;
 
 	if( bufRecvSPI.buf[0] == '!' )
 	{
-	    LED3SET = 1;
+//	    LED3SET = 1;
 	    wifiCommandAdd( bufRecvSPI.buf );
 	}
     }
@@ -803,14 +895,14 @@ bool spiResponseEnd( void )
 
     if( bufRecvSPI.buf[ bufRecvSPI.posWrite - 1 ] == '*' )
     {
-		if( LED3READ == 0 )
-		{
-		    LED3SET = 1;
-		}
-		else
-		{
-		    LED3SET = 1;
-		}
+//		if( LED3READ == 0 )
+//		{
+//		    LED3SET = 1;
+//		}
+//		else
+//		{
+//		    LED3SET = 1;
+//		}
 
 	responseEnd = true;
     }
@@ -845,7 +937,8 @@ void spiCommSend( void )
     }
     else
     {
-	bufSendSPI.posRead = 0;
+//  Confirmed, does send
+    bufSendSPI.posRead = 0;
 	bufSendSPI.posWrite = 0;
     }
     return;
@@ -884,9 +977,10 @@ bool spiCommRecv( void )
 {
     bool dataReceived = false;
     char data;
-
     if( spiCommRecvChar( &data ) == true )
     {
+// This is where the magic spi happens Zach
+
 	bufRecvSPI.buf[bufRecvSPI.posWrite] = data;
 	dataReceived = true;
 	bufRecvSPI.posWrite++;
@@ -896,7 +990,6 @@ bool spiCommRecv( void )
 	}
 	bufRecvSPI.buf[bufRecvSPI.posWrite] = CHAR_NULL;
     }
-
     return dataReceived;
 }
 
@@ -916,7 +1009,6 @@ bool spiCommRecv( void )
 bool spiCommRecvChar( char *data )
 {
     bool recvGood = false;
-
     if( SPI1STATbits.SPIRBF == 0b1 )
     {
 	*data = SPI1BUF;
@@ -924,7 +1016,6 @@ bool spiCommRecvChar( char *data )
 //	if( *data != '@' )
 //	{
 	    U2TXREG = *data;
-        U2TXREG = 'o';
 //	}
     }
 
@@ -942,7 +1033,7 @@ void spiInit( void )
     TRISBbits.TRISB6 = 0;
 
     TRISBbits.TRISB12 = 1;
-    TRISAbits.TRISA7 = 1;
+//    TRISAbits.TRISA7 = 1;
 
     //SPI1 Initialize as Slave
     SPI1CON1bits.MSTEN = 0;

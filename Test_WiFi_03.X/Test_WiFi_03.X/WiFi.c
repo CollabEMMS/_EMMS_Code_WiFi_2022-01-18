@@ -252,7 +252,7 @@ void wifi( bool init )
 		    LED1SET = 0;
 		    LED2SET = 0;
 		}
-		__delay_ms( 25 );
+		__delay_ms( 10 );
 		runone = true;
 	    }
 	    LED1SET = 0;
@@ -728,7 +728,7 @@ void spi( bool init )
 	if( spiInReset == false )
 	{
 	    spiInReset = true;
-	    SPI2STATbits.SPIEN = 0; //disable SPI
+	    SPI1STATbits.SPIEN = 0; //disable SPI
 	}
     }
     else
@@ -740,7 +740,7 @@ void spi( bool init )
 	    bufRecvSPI.posRead = 0;
 	    bufRecvSPI.posWrite = 0;
 	    //	    spiCommandSet( "!Set;Watts;55*" );
-	    SPI2STATbits.SPIEN = 1; //enable SPI
+	    SPI1STATbits.SPIEN = 1; //enable SPI
 	}
 
 	spiComm( );
@@ -869,10 +869,11 @@ bool spiCommSendChar( char data )
     bool sendGood = false;
 
 
-    if( SPI2STATbits.SPITBF == 0b0 ) //if in enhance mode use SPI1STATbits.SR1MPT
+    if( SPI1STATbits.SPITBF == 0b0 ) //if in enhance mode use SPI1STATbits.SR1MPT
     {
-	SPI2BUF = data;
+	SPI1BUF = data;
 	sendGood = true;
+    __delay_ms(1);
 	U2TXREG = data;
     }
 
@@ -916,14 +917,15 @@ bool spiCommRecvChar( char *data )
 {
     bool recvGood = false;
 
-    if( SPI2STATbits.SPIRBF == 0b1 )
+    if( SPI1STATbits.SPIRBF == 0b1 )
     {
-	*data = SPI2BUF;
+	*data = SPI1BUF;
 	recvGood = true;
 //	if( *data != '@' )
-	{
+//	{
 	    U2TXREG = *data;
-	}
+        U2TXREG = 'o';
+//	}
     }
 
     return recvGood;
@@ -942,29 +944,29 @@ void spiInit( void )
     TRISBbits.TRISB12 = 1;
     TRISAbits.TRISA7 = 1;
 
-    //SPI2 Initialize as Slave
-    SPI2CON1bits.MSTEN = 0;
+    //SPI1 Initialize as Slave
+    SPI1CON1bits.MSTEN = 0;
 
-    SPI2CON1bits.DISSCK = 0b1; // SPI clock disabled
-    SPI2CON1bits.DISSDO = 0b0; // SDO used
-    SPI2CON1bits.MODE16 = 0b0; // 8 bit mode
-    SPI2CON1bits.SMP = 0b0; // sample phase mode middle
-    SPI2CON1bits.CKE = 0b1; // serial data changes on active to idle clock state
-    SPI2CON1bits.SSEN = 0b1; // yes a slave
-    SPI2CON1bits.CKP = 0b1; // clock idle is high
-    SPI2CON1bits.SPRE = 0b000; // secondary prescale 8:1, not used - no clock is run
+    SPI1CON1bits.DISSCK = 0b1; // SPI clock disabled
+    SPI1CON1bits.DISSDO = 0b0; // SDO used
+    SPI1CON1bits.MODE16 = 0b0; // 8 bit mode
+    SPI1CON1bits.SMP = 0b0; // sample phase mode middle
+    SPI1CON1bits.CKE = 0b1; // serial data changes on active to idle clock state
+    SPI1CON1bits.SSEN = 0b1; // yes a slave
+    SPI1CON1bits.CKP = 0b1; // clock idle is high
+    SPI1CON1bits.SPRE = 0b000; // secondary prescale 8:1, not used - no clock is run
 
-    SPI2CON2bits.FRMEN = 0b0; // frame mode, unused
-    SPI2CON2bits.SPIFSD = 0b0; // frame mode, unused
-    SPI2CON2bits.SPIFPOL = 0b0; // frame mode, unused
-    SPI2CON2bits.SPIFE = 0b0; // frame mode, unused
+    SPI1CON2bits.FRMEN = 0b0; // frame mode, unused
+    SPI1CON2bits.SPIFSD = 0b0; // frame mode, unused
+    SPI1CON2bits.SPIFPOL = 0b0; // frame mode, unused
+    SPI1CON2bits.SPIFE = 0b0; // frame mode, unused
 
-    SPI2CON2bits.SPIBEN = 0b0; // 1=enhanced buffer mode
+    SPI1CON2bits.SPIBEN = 0b0; // 1=enhanced buffer mode
 
-    SPI2STATbits.SPIROV = 0; //clear flag for overflow data
+    SPI1STATbits.SPIROV = 0; //clear flag for overflow data
 
-    SPI2BUF = SPI2BUF; //clear the buffer
-    SPI2STATbits.SPIEN = 1; //enable SPI
+    SPI1BUF = SPI1BUF; //clear the buffer
+    SPI1STATbits.SPIEN = 1; //enable SPI
 
     return;
 }

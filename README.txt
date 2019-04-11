@@ -2,7 +2,7 @@ WiFI Module
 @author: Zach Holsinger
 @editor: Joe Wambach
 
-last edit date: 3/7/2019
+last edit date: 4/4/2019
 
 v1.0
 
@@ -24,7 +24,8 @@ Needs To Be Changed:
 	- Change SCH symbol for headers and connectors
 		DONE
 	- Add Silkscreen labels to new header footprints
+		DONE
 	- Add 12V pin on SPI
-	- 
+		DONE
 
 

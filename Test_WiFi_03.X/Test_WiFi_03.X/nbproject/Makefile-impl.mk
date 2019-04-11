@@ -24,7 +24,7 @@ CLEAN_SUBPROJECTS=${CLEAN_SUBPROJECTS_${SUBPROJECTS}}
 
 
 # Project Name
-PROJECTNAME=Test_WiFi_03.X
+PROJECTNAME=Tes_WIFI_Archive
 
 # Active Configuration
 DEFAULTCONF=default

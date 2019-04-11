@@ -739,7 +739,7 @@ void spi( bool init )
 	    spiInReset = false;
 	    bufRecvSPI.posRead = 0;
 	    bufRecvSPI.posWrite = 0;
-	    //	    spiCommandSet( "!Set;Watts;55*" );
+	    // spiCommandSet( "!Set;Watts;55*" );
 	    SPI1STATbits.SPIEN = 1; //enable SPI
 	}
 

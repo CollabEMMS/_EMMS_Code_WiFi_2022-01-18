@@ -300,12 +300,12 @@ usercode
 
 __FBS             0xf80000          0x2
  *(__FBS.sec*)
- __FBS.sec        0xf80000          0x2 /CW/_FBS¿” 
+ __FBS.sec        0xf80000          0x2 /CW/_FBSÿ–
                   0xf80000                  __FBS.sec
 
 __FGS             0xf80004          0x2
  *(__FGS.sec*)
- __FGS.sec        0xf80004          0x2 /CW/_FGSà‰∂
+ __FGS.sec        0xf80004          0x2 /CW/_FGSà‰ª
                   0xf80004                  __FGS.sec
 
 __FOSCSEL
@@ -329,10 +329,10 @@ __FDS
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x2628
+.debug_info       0x000000       0x25e0
  *(.debug_info)
  .debug_info      0x000000        0xa3a build/default/production/WiFi_main.o
- .debug_info      0x000a3a       0x1bee build/default/production/WiFi.o
+ .debug_info      0x000a3a       0x1ba6 build/default/production/WiFi.o
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000        0x347
@@ -993,8 +993,8 @@ LOAD c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libm-elf.a
 LOAD c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libc-elf.a
 END GROUP
 OUTPUT(dist/default/production/Tes_WIFI_Archive.production.elf elf32-pic30)
-LOAD /CW/_FGSà‰∂
-LOAD /CW/_FBS¿” 
+LOAD /CW/_FGSà‰ª
+LOAD /CW/_FBSÿ–
 LOAD default_isr
 LOAD data_init
 

@@ -133,25 +133,29 @@ void wifi( bool init )
 	stage = 0;
 	wifiInit( );
     }
-
     wifiComm( );
+    
+//    volatile int currentCommand;// used to make sure specific data is sent in tcp response
+//    volatile int currentWiFiNetwork; // Used to quickly save the network that works, to prevent dropping off of wifi and long startup times
 
-    static bool runone = false;
-
-    switch( stage )
+    switch( stage )   
     {
-    case 0: // reset and init
-        
+    case 0:
+    {
+
+    // reset and init 
 	// set command
 	wifiCommandSet( "RST", true );
 	stage++;
 	break;
+    }
     case 1:
 	//wait for response
 	if( wifiResponseCheck( "ready" ) == true )
 	{
 	    stage++;
 	}
+    
 	break;
     case 2:
 	wifiCommandSet( "RFPOWER=82", true );
@@ -162,6 +166,10 @@ void wifi( bool init )
 	{
 	    stage++;
 	}
+    if( wifiResponseCheck( "FAIL" ) == true )
+	{
+	    stage = 0;
+	}
 	break;
     case 4:
         wifiCommandSet( "CWMODE_CUR=1", true );
@@ -171,6 +179,10 @@ void wifi( bool init )
 	if( wifiResponseCheck( "OK" ) == true )
 	{
 	    stage++;
+	}
+    if( wifiResponseCheck( "FAIL" ) == true )
+	{
+	    stage = 0;
 	}
 	break;
     case 6:
@@ -183,20 +195,63 @@ void wifi( bool init )
 	{
 	    stage++;
 	}
+    if( wifiResponseCheck( "FAIL" ) == true )
+	{
+	    stage = 0;
+	}
 	break;
     case 8:
-	wifiCommandSet( "CWJAP_CUR=\"mWiFi\",\"mahadaga\"", true );
-	wifiCommandSet( "CWJAP_CUR=\"AW2\",\"*****\"", true );
-    stage++;
-	break;
+    {
+        __delay_ms(1000);
+        wifiCommandSet( "CWJAP_CUR=\"mWiFi\",\"mahadaga\"", true );
+//        wifiCommandSet( "CWJAP_CUR=\"Messiah Guest\",\"\"", true );
+
+//        wifiCommandSet( "CWJAP_CUR=\"AW2\",\"*****\"", true ); // Not sure what this does
+        stage++;  
+    break;
+    }
     case 9:
+    {
+    static int cautiousMuch = 0;
+    static int currentWiFiNetwork;
 	if( wifiResponseCheck( "OK" ) == true )
 	{
 	    stage++;
 	}
+    if( wifiResponseCheck( "FAIL" ) == true || wifiResponseCheck( "ERROR" ) == true) {
+        cautiousMuch = 0;
+        __delay_ms (1000);
+        if( currentWiFiNetwork == 1 ) {
+        currentWiFiNetwork = 0;
+        } else {
+        currentWiFiNetwork++;
+        }
+        
+        
+        if( currentWiFiNetwork == 0 ) {
+            stage = 8;
+        }
+        if( currentWiFiNetwork == 1 ) {
+            stage = 20;
+        }
+    }
+    
+    if( wifiResponseCheck( "WIFI DISCONNECT" ) == true )
+	{
+	    cautiousMuch = 1;
+	}
+    
+    if( wifiResponseCheck( "WIFI CONNECTED" ) == true && cautiousMuch == 1)
+	{
+        cautiousMuch = 0;
+	    stage = 0;
+	}
 	break;
+    }
     case 10:
 	wifiCommandSet( "CIFSR", true );
+//    wifiCommandSet( "CIPAP=\"192.167.0.101\"", true );
+
     stage++;
 	break;
     case 11:
@@ -204,6 +259,15 @@ void wifi( bool init )
 	{
 	    stage++;
 	}
+    if( wifiResponseCheck( "FAIL" ) == true )
+	{
+	    stage = 0;
+	}
+    if( wifiResponseCheck( "ERROR" ) == true )
+    {
+        stage = 0;
+    }
+    
 	break;
     case 12:
 	wifiCommandSet( "CIPMUX=1", true );
@@ -213,6 +277,10 @@ void wifi( bool init )
 	if( wifiResponseCheck( "OK" ) == true )
 	{
 	    stage++;
+	}
+    if( wifiResponseCheck( "FAIL" ) == true )
+	{
+	    stage = 0;
 	}
 	break;
     case 14:
@@ -224,6 +292,10 @@ void wifi( bool init )
 	{
 	    stage++;
 	}
+    if( wifiResponseCheck( "FAIL" ) == true )
+	{
+	    stage = 0;
+	}
 	break;
     case 16:
 	wifiCommandSet( "CIPSERVER=1,80", true );
@@ -234,10 +306,13 @@ void wifi( bool init )
 	{
 	    stage++;
 	}
+    if( wifiResponseCheck( "FAIL" ) == true )
+	{
+	    stage = 0;
+	}
 	break;
     case 18:
-	if( runone == false )
-	{
+
 	    //	    spiCommandSet( "\r\nConnected!*" );
 //	    for( int inx = 0; inx < 40; inx++ )
 //	    {
@@ -276,12 +351,58 @@ void wifi( bool init )
     LED3SET = 0;
 
     // only do the light pulse once
-    runone = true;
-    }
     wifiServer( );
     stage++;
     break;
     case 19:
+    {
+    static int currentCommand = 0;
+        
+     if( wifiResponseCheck( "0,CONNECT" ) == true) {
+        wifiCommandSet( "CIPSEND=0,31", true );
+        currentCommand = 1;
+     } else if( wifiResponseCheck( "OK" ) == true ) {
+         if( currentCommand == 1) {
+            wifiCommandSet( "MESSIAH COLLEGE COLLABORATORY\n\r", false );
+            currentCommand = 0;
+         }
+     }
+     
+
+     if( wifiResponseCheck( "+IPD,0,11:get!Config;" ) == true ) {
+         // have it send variable of IP Shtuff from cifsr
+         wifiCommandSet( "CIPSEND=0,59", true );
+         currentCommand = 2;
+     } else if( wifiResponseCheck( "OK" ) == true ) {
+         if( currentCommand == 2) {
+        wifiCommandSet( "EMMS Collaboratory Team\r\nSpring 2019\r\nWiFi V1.1\r\nMeter #3\r\n", false );
+        currentCommand = 0;
+         }
+     }
+     
+     if( wifiResponseCheck( "+IPD,0,5:close" ) == true ) {
+         // have it send variable of IP Shtuff from cifsr
+         wifiCommandSet( "CIPCLOSE=0", true );
+     }
+     
+     if( wifiResponseCheck( "+IPD,0,5:reset" ) == true ) {
+         // have it send variable of IP Shtuff from cifsr
+         wifiCommandSet( "CIPSEND=0,7", true );
+         currentCommand = 3;
+     } else if( wifiResponseCheck( "OK" ) == true ) {
+        if( currentCommand == 3) {
+        wifiCommandSet( "Bye Bye", false );
+//        currentCommand = 0;
+        }
+     } else if ( wifiResponseCheck( "SEND OK" ) == true) {
+         if( currentCommand == 3 ) {
+        wifiCommandSet( "CIPCLOSE=0", true );
+        currentCommand = 0;
+        stage = 0;
+         }
+        
+        }
+    
     if( wifiResponseCheck( "WIFI DISCONNECT" ) == true )
 	{
         // Means it Lost the Network
@@ -316,17 +437,16 @@ void wifi( bool init )
         U2TXREG = 'o';
         __delay_ms( 50 );
         U2TXREG = 'n'; 
-        stage++;
+        stage = 0;
 	}
     break;
-    case 20:
-    if( wifiResponseCheck( "WIFI GOT IP" ) == true )
-	{
-        LED1SET = 1;
-        stage = 10;
-            
-            
     }
+    case 20:
+        __delay_ms( 70 );
+//        wifiCommandSet( "CWJAP_CUR=\"Messiah Guest\",\"\"", true );
+//        wifiCommandSet( "CWJAP_CUR=\"mWiFi\",\"mahadaga\"", true );
+
+        stage = 9;
     }
 
 

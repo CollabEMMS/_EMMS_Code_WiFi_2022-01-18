@@ -34,7 +34,7 @@ void wifi( bool init );
 void wifiComm( void );
 void wifiCommandSet( char *command, bool addPrefix );
 void wifiServer( void );
-bool wifiResponseCheck( char* response );
+bool wifiResponseCheck( char* response, char* varOutput );
 bool wifiResponseEnd( void );
 void wifiCommSend( void );
 bool wifiCommSendChar( char data );
@@ -52,6 +52,15 @@ void spiCommandSet( char *command );
 void spiServer( void );
 void spi( bool init );
 void spiInit( void );
+
+// Wifi-related variables
+
+char networkInfo[100] = "";
+char ipAddr[20] = "";
+char macAddr[20] = "";
+char ssidInfo[50] = "";
+bool getBuffer = false;
+
 
 void wifiInit( )
 {
@@ -151,7 +160,7 @@ void wifi( bool init )
     }
     case 1:
 	//wait for response
-	if( wifiResponseCheck( "ready" ) == true )
+	if( wifiResponseCheck( "ready" , "null") == true )
 	{
 	    stage++;
 	}
@@ -162,11 +171,11 @@ void wifi( bool init )
     stage++;
 	break;
     case 3:
-	if( wifiResponseCheck( "OK" ) == true )
+	if( wifiResponseCheck( "OK", "null" ) == true )
 	{
 	    stage++;
 	}
-    if( wifiResponseCheck( "FAIL" ) == true )
+    if( wifiResponseCheck( "FAIL", "null" ) == true )
 	{
 	    stage = 0;
 	}
@@ -176,11 +185,11 @@ void wifi( bool init )
         stage++;
 	break;
     case 5:
-	if( wifiResponseCheck( "OK" ) == true )
+	if( wifiResponseCheck( "OK", "null" ) == true )
 	{
 	    stage++;
 	}
-    if( wifiResponseCheck( "FAIL" ) == true )
+    if( wifiResponseCheck( "FAIL", "null" ) == true )
 	{
 	    stage = 0;
 	}
@@ -191,18 +200,17 @@ void wifi( bool init )
 	stage++;
 	break;
     case 7:
-	if( wifiResponseCheck( "OK" ) == true )
+	if( wifiResponseCheck( "OK", "null" ) == true )
 	{
 	    stage++;
 	}
-    if( wifiResponseCheck( "FAIL" ) == true )
+    if( wifiResponseCheck( "FAIL", "null" ) == true )
 	{
 	    stage = 0;
 	}
 	break;
     case 8:
     {
-        __delay_ms(1000);
         wifiCommandSet( "CWJAP_CUR=\"mWiFi\",\"mahadaga\"", true );
 //        wifiCommandSet( "CWJAP_CUR=\"Messiah Guest\",\"\"", true );
 
@@ -214,11 +222,18 @@ void wifi( bool init )
     {
     static int cautiousMuch = 0;
     static int currentWiFiNetwork;
-	if( wifiResponseCheck( "OK" ) == true )
+	if( wifiResponseCheck( "OK" , "null") == true )
 	{
 	    stage++;
 	}
-    if( wifiResponseCheck( "FAIL" ) == true || wifiResponseCheck( "ERROR" ) == true) {
+    if( wifiResponseCheck( "FAIL", "null" ) == true || wifiResponseCheck( "ERROR", "null" ) == true) {
+//        if( cautiousMuch == 1 ) {
+//            stage = 0;
+//        } else 
+            if( cautiousMuch == 2)
+        {
+            stage = 0;
+        } else {
         cautiousMuch = 0;
         __delay_ms (1000);
         if( currentWiFiNetwork == 1 ) {
@@ -234,14 +249,18 @@ void wifi( bool init )
         if( currentWiFiNetwork == 1 ) {
             stage = 20;
         }
+        }
     }
-    
-    if( wifiResponseCheck( "WIFI DISCONNECT" ) == true )
+    if( wifiResponseCheck( "WIFI CONNECTED", "null" ) == true ) 
+    {
+        cautiousMuch = 2;
+    }
+    if( wifiResponseCheck( "WIFI DISCONNECT", "null" ) == true)
 	{
 	    cautiousMuch = 1;
 	}
     
-    if( wifiResponseCheck( "WIFI CONNECTED" ) == true && cautiousMuch == 1)
+    if( wifiResponseCheck( "WIFI CONNECTED", "null" ) == true && cautiousMuch == 1)
 	{
         cautiousMuch = 0;
 	    stage = 0;
@@ -249,22 +268,27 @@ void wifi( bool init )
 	break;
     }
     case 10:
+    getBuffer = true;
 	wifiCommandSet( "CIFSR", true );
 //    wifiCommandSet( "CIPAP=\"192.167.0.101\"", true );
 
     stage++;
 	break;
     case 11:
-	if( wifiResponseCheck( "OK" ) == true )
+
+	if( wifiResponseCheck( "OK", "null" ) == true )
 	{
+        getBuffer = false;
 	    stage++;
 	}
-    if( wifiResponseCheck( "FAIL" ) == true )
+    if( wifiResponseCheck( "FAIL", "null" ) == true )
 	{
+        getBuffer = false;
 	    stage = 0;
 	}
-    if( wifiResponseCheck( "ERROR" ) == true )
+    if( wifiResponseCheck( "ERROR", "null" ) == true )
     {
+        getBuffer = false;
         stage = 0;
     }
     
@@ -274,11 +298,11 @@ void wifi( bool init )
     stage++;
 	break;
     case 13:
-	if( wifiResponseCheck( "OK" ) == true )
+	if( wifiResponseCheck( "OK", "null" ) == true )
 	{
 	    stage++;
 	}
-    if( wifiResponseCheck( "FAIL" ) == true )
+    if( wifiResponseCheck( "FAIL", "null" ) == true )
 	{
 	    stage = 0;
 	}
@@ -288,11 +312,11 @@ void wifi( bool init )
     stage++;
 	break;
     case 15:
-	if( wifiResponseCheck( "OK" ) == true )
+	if( wifiResponseCheck( "OK", "null" ) == true )
 	{
 	    stage++;
 	}
-    if( wifiResponseCheck( "FAIL" ) == true )
+    if( wifiResponseCheck( "FAIL", "null" ) == true )
 	{
 	    stage = 0;
 	}
@@ -302,11 +326,11 @@ void wifi( bool init )
     stage++;
 	break;
     case 17:
-	if( wifiResponseCheck( "OK" ) == true )
+	if( wifiResponseCheck( "OK", "null" ) == true )
 	{
 	    stage++;
 	}
-    if( wifiResponseCheck( "FAIL" ) == true )
+    if( wifiResponseCheck( "FAIL", "null" ) == true )
 	{
 	    stage = 0;
 	}
@@ -358,10 +382,10 @@ void wifi( bool init )
     {
     static int currentCommand = 0;
         
-     if( wifiResponseCheck( "0,CONNECT" ) == true) {
+     if( wifiResponseCheck( "0,CONNECT", "null" ) == true) {
         wifiCommandSet( "CIPSEND=0,31", true );
         currentCommand = 1;
-     } else if( wifiResponseCheck( "OK" ) == true ) {
+     } else if( wifiResponseCheck( "OK", "null" ) == true ) {
          if( currentCommand == 1) {
             wifiCommandSet( "MESSIAH COLLEGE COLLABORATORY\n\r", false );
             currentCommand = 0;
@@ -369,33 +393,44 @@ void wifi( bool init )
      }
      
 
-     if( wifiResponseCheck( "+IPD,0,11:get!Config;" ) == true ) {
+     if( wifiResponseCheck( "+IPD,0,11:get!Config;", "null" ) == true ) {
          // have it send variable of IP Shtuff from cifsr
          wifiCommandSet( "CIPSEND=0,59", true );
          currentCommand = 2;
-     } else if( wifiResponseCheck( "OK" ) == true ) {
+     } else if( wifiResponseCheck( "OK", "null" ) == true ) {
          if( currentCommand == 2) {
         wifiCommandSet( "EMMS Collaboratory Team\r\nSpring 2019\r\nWiFi V1.1\r\nMeter #3\r\n", false );
         currentCommand = 0;
          }
      }
+    
+    if( wifiResponseCheck( "+IPD,0,7:network", "null" ) == true ) {
+         // have it send variable of IP Shtuff from cifsr
+         wifiCommandSet( "CIPSEND=0,100", true );
+         currentCommand = 3;
+     } else if( wifiResponseCheck( "OK", "null" ) == true ) {
+         if( currentCommand == 3) {
+        wifiCommandSet( networkInfo, false );
+        currentCommand = 0;
+         }
+     }
      
-     if( wifiResponseCheck( "+IPD,0,5:close" ) == true ) {
+     if( wifiResponseCheck( "+IPD,0,5:close", "null" ) == true ) {
          // have it send variable of IP Shtuff from cifsr
          wifiCommandSet( "CIPCLOSE=0", true );
      }
      
-     if( wifiResponseCheck( "+IPD,0,5:reset" ) == true ) {
+     if( wifiResponseCheck( "+IPD,0,5:reset", "null" ) == true ) {
          // have it send variable of IP Shtuff from cifsr
          wifiCommandSet( "CIPSEND=0,7", true );
-         currentCommand = 3;
-     } else if( wifiResponseCheck( "OK" ) == true ) {
-        if( currentCommand == 3) {
+         currentCommand = 4;
+     } else if( wifiResponseCheck( "OK", "null" ) == true ) {
+        if( currentCommand == 4) {
         wifiCommandSet( "Bye Bye", false );
 //        currentCommand = 0;
         }
-     } else if ( wifiResponseCheck( "SEND OK" ) == true) {
-         if( currentCommand == 3 ) {
+     } else if ( wifiResponseCheck( "SEND OK", "null" ) == true) {
+         if( currentCommand == 4 ) {
         wifiCommandSet( "CIPCLOSE=0", true );
         currentCommand = 0;
         stage = 0;
@@ -403,7 +438,7 @@ void wifi( bool init )
         
         }
     
-    if( wifiResponseCheck( "WIFI DISCONNECT" ) == true )
+    if( wifiResponseCheck( "WIFI DISCONNECT" , "null") == true )
 	{
         // Means it Lost the Network
         LED1SET = 0;
@@ -444,7 +479,7 @@ void wifi( bool init )
     case 20:
         __delay_ms( 70 );
 //        wifiCommandSet( "CWJAP_CUR=\"Messiah Guest\",\"\"", true );
-//        wifiCommandSet( "CWJAP_CUR=\"mWiFi\",\"mahadaga\"", true );
+        wifiCommandSet( "CWJAP_CUR=\"mWiFi\",\"mahadaga\"", true );
 
         stage = 9;
     }
@@ -697,23 +732,68 @@ void wifiCommandSet( char *command, bool addPrefix )
 
 }
 
-bool wifiResponseCheck( char* response )
+bool wifiResponseCheck( char* response, char* varOutput )
 {
     bool match = false;
-
+    bool varmatch = false;
+    bool keepBuffer = false;
+    
+    char doNothingChar[] = "null";
+    char ipAddr[] = "ipAddr";
+    char networkInfo[] = "networkInfo";
+    char macAddr[] = "macAddr";
+    char ssidInfo[] = "ssidInfo";
+    char flush[] = "flush";
+    
+    int i = strcmp(doNothingChar, varOutput);
+    
+    if( i != 0 )
+    {
+        keepBuffer = true;
+    }
+    
+    
     if( wifiResponseEnd( ) == true )
     {
 	match = true;
+    varmatch = true;
 	int inx = 0;
-
 	while( (response[inx] != CHAR_NULL) && (match == true) )
 	{
-	    if( response[inx] != bufRecvWiFi.buf[inx] )
+	    
+        // Checks response against incoming wifi stream
+        if( response[inx] != bufRecvWiFi.buf[inx] )
 	    {
 		match = false;
 	    }
+        
+        if( keepBuffer == true ) 
+        {
+            if ( strcmp(ipAddr, varOutput) == 0 || strcmp(macAddr, varOutput) == 0 || strcmp(networkInfo, varOutput) == 0 || strcmp(ssidInfo, varOutput) == 0){
+//            U2TXREG = '%';
+//            networkInfo[inx] += bufRecvWiFi.buf[inx];
+            }
+            i = strcmp(flush, varOutput);
+            if( i == 0) {
+                U2TXREG = 'F';
+                U2TXREG = 'l';
+                U2TXREG = 'u';
+                U2TXREG = 's';
+                U2TXREG = 'h';
+                U2TXREG = 'e';
+                U2TXREG = 'd';
+                
+                networkInfo[inx] = ' ';
+                ipAddr[inx] = ' ';
+                macAddr[inx] = ' ';
+                ssidInfo[inx] = ' ';
+            }
+        }
+        
 	    inx++;
 	}
+    
+    
     }
 
     return match;
@@ -722,6 +802,9 @@ bool wifiResponseCheck( char* response )
 bool wifiResponseEnd( void )
 {
     bool responseEnd = false;
+    
+    
+    
     if( bufRecvWiFi.posWrite >= 2 )
     {
 	if( bufRecvWiFi.buf[bufRecvWiFi.posWrite - 2] == CHAR_CR )
@@ -859,12 +942,21 @@ bool wifiCommRecv( void )
 bool wifiCommRecvChar( char *data )
 {
     bool dataReceived = false;
+    static int counter = 0;
 
     if( U1STAbits.URXDA == 1 )
     {
 	*data = U1RXREG;
 	dataReceived = true;
 	U2TXREG = *data;
+    if( getBuffer == true ) {  
+        networkInfo[counter] = *data;
+        counter ++;
+    }
+    if( counter == 101 )
+    {
+        counter = 0;
+    }
     
     // Flashes at UART Communication
     if( LED3READ == 0 )

@@ -3,11 +3,14 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
+
 
 #include "test_LEDs.h"
 #include "pic_frequency.h"
 #include "limits.h"
 #include <libpic30.h>
+
 
 #define CHAR_NULL '\0'
 #define CHAR_CR '\r'
@@ -52,7 +55,8 @@ void spiCommandSet( char *command );
 void spiServer( void );
 void spi( bool init );
 void spiInit( void );
-
+void remove_all_chars(char* str, char c);
+int return_char_length(char* str);
 // Wifi-related variables
 
 char networkInfo[100] = "";
@@ -60,6 +64,7 @@ char ipAddr[20] = "";
 char macAddr[20] = "";
 char ssidInfo[50] = "";
 bool getBuffer = false;
+int counter = 0;
 
 
 void wifiInit( )
@@ -211,7 +216,7 @@ void wifi( bool init )
 	break;
     case 8:
     {
-        wifiCommandSet( "CWJAP_CUR=\"mWiFi\",\"mahadaga\"", true );
+        wifiCommandSet( "CWJAP_CUR=\"EMMS-Zim2019\",\"emms-mahadaga\"", true );
 //        wifiCommandSet( "CWJAP_CUR=\"Messiah Guest\",\"\"", true );
 
 //        wifiCommandSet( "CWJAP_CUR=\"AW2\",\"*****\"", true ); // Not sure what this does
@@ -269,6 +274,8 @@ void wifi( bool init )
     }
     case 10:
     getBuffer = true;
+    memset(&networkInfo[0], 0, sizeof(networkInfo));
+    counter = 0;
 	wifiCommandSet( "CIFSR", true );
 //    wifiCommandSet( "CIPAP=\"192.167.0.101\"", true );
 
@@ -392,21 +399,33 @@ void wifi( bool init )
          }
      }
      
+    // prints network info from cifsr
+     if( wifiResponseCheck( "+IPD,0,15:!MOD;NETWORK*", "null" ) == true ) {
+         // have it send variable of IP Shtuff from cifsr
+        remove_all_chars(networkInfo, '\n');
+        remove_all_chars(networkInfo, '\r');
+        remove_all_chars(networkInfo, '+');
+        remove_all_chars(networkInfo, '>');
+        remove_all_chars(networkInfo, '"');
+        char str[2] = "\n";
+        strcat(networkInfo, str);
+        char strPrefix[] = "CIPSEND=0,";
+        char toCharr[10];
+        int old_array_len = return_char_length(networkInfo);
+        sprintf(toCharr, "%d", old_array_len);
+        int new_array_len = 10 + return_char_length(toCharr);
 
-     if( wifiResponseCheck( "+IPD,0,11:get!Config;", "null" ) == true ) {
-         // have it send variable of IP Shtuff from cifsr
-         wifiCommandSet( "CIPSEND=0,59", true );
-         currentCommand = 2;
-     } else if( wifiResponseCheck( "OK", "null" ) == true ) {
-         if( currentCommand == 2) {
-        wifiCommandSet( "EMMS Collaboratory Team\r\nSpring 2019\r\nWiFi V1.1\r\nMeter #3\r\n", false );
-        currentCommand = 0;
-         }
-     }
-    
-    if( wifiResponseCheck( "+IPD,0,7:network", "null" ) == true ) {
-         // have it send variable of IP Shtuff from cifsr
-         wifiCommandSet( "CIPSEND=0,100", true );
+        char sendCommand[new_array_len];
+        for(int i =0; i < new_array_len; i++) {
+            if(i < 10) {
+                sendCommand[i] = strPrefix[i];
+            }
+            if( i >= 10 ) {
+                sendCommand[i] = toCharr[i-10];
+            }
+        }
+        
+         wifiCommandSet( sendCommand, true );
          currentCommand = 3;
      } else if( wifiResponseCheck( "OK", "null" ) == true ) {
          if( currentCommand == 3) {
@@ -414,13 +433,24 @@ void wifi( bool init )
         currentCommand = 0;
          }
      }
+
+     if( wifiResponseCheck( "+IPD,0,14:!MOD;CONFIG*", "null" ) == true ) {
+         // have it send variable of IP Shtuff from cifsr
+         wifiCommandSet( "CIPSEND=0,57", true );
+         currentCommand = 2;
+     } else if( wifiResponseCheck( "OK", "null" ) == true ) {
+         if( currentCommand == 2) {
+        wifiCommandSet( "EMMS Collaboratory Team;Spring 2019;WiFi V1.1;Meter #3\n", false );
+        currentCommand = 0;
+         }
+     }
      
-     if( wifiResponseCheck( "+IPD,0,5:close", "null" ) == true ) {
+     if( wifiResponseCheck( "+IPD,0,11:!MOD;CLOSE*", "null" ) == true ) {
          // have it send variable of IP Shtuff from cifsr
          wifiCommandSet( "CIPCLOSE=0", true );
      }
      
-     if( wifiResponseCheck( "+IPD,0,5:reset", "null" ) == true ) {
+     if( wifiResponseCheck( "+IPD,0,11:!MOD;RESET*", "null" ) == true ) {
          // have it send variable of IP Shtuff from cifsr
          wifiCommandSet( "CIPSEND=0,7", true );
          currentCommand = 4;
@@ -433,7 +463,7 @@ void wifi( bool init )
          if( currentCommand == 4 ) {
         wifiCommandSet( "CIPCLOSE=0", true );
         currentCommand = 0;
-        stage = 0;
+        asm("RESET"); // Resets Pic
          }
         
         }
@@ -479,7 +509,7 @@ void wifi( bool init )
     case 20:
         __delay_ms( 70 );
 //        wifiCommandSet( "CWJAP_CUR=\"Messiah Guest\",\"\"", true );
-        wifiCommandSet( "CWJAP_CUR=\"mWiFi\",\"mahadaga\"", true );
+        wifiCommandSet( "CWJAP_CUR=\"EMMS-Meters\",\"emms_meters\"", true );
 
         stage = 9;
     }
@@ -942,8 +972,6 @@ bool wifiCommRecv( void )
 bool wifiCommRecvChar( char *data )
 {
     bool dataReceived = false;
-    static int counter = 0;
-
     if( U1STAbits.URXDA == 1 )
     {
 	*data = U1RXREG;
@@ -1272,4 +1300,25 @@ void spiInit( void )
     SPI1STATbits.SPIEN = 1; //enable SPI
 
     return;
+}
+
+void remove_all_chars(char* str, char c) {
+    char *pr = str, *pw = str;
+    while (*pr) {
+        *pw = *pr++;
+        pw += (*pw != c);
+    }
+    *pw = '\0';
+}
+
+int return_char_length(char* str) {
+    static int i = 0;
+    char chars = str[i];
+    int accumulator = 0;
+    while( chars != '\0' ) {
+        i++;
+        chars = str[i];
+        accumulator++;
+    }
+    return accumulator;
 }

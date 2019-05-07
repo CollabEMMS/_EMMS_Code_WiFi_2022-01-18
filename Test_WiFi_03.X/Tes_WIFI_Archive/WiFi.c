@@ -55,6 +55,8 @@ void spiServer(void);
 void spi(bool init);
 void spiInit(void);
 void remove_all_chars(char* str, char c);
+char networkInfoPrepared(char* networkInfo);
+char networkInfoSend(char* networkInfo);
 int return_char_length(char* str);
 // Wifi-related variables
 
@@ -1158,7 +1160,7 @@ void remove_all_chars(char* str, char c) {
     *pw = '\0';
 }
 
-int return_char_length(char* str) {
+int return_char_length(char str) {
     static int i = 0;
     char chars = str[i];
     int accumulator = 0;
@@ -1170,7 +1172,7 @@ int return_char_length(char* str) {
     return accumulator;
 }
 
-char networkInfoPrepared(char networkInfo) {
+char* networkInfoPrepared(char* networkInfo) {
     remove_all_chars(networkInfo, '\n');
     remove_all_chars(networkInfo, '\r');
     remove_all_chars(networkInfo, '+');
@@ -1179,15 +1181,15 @@ char networkInfoPrepared(char networkInfo) {
     char str[2] = "\n";
     strcat(networkInfo, str);
 
-    return networkInfo;
+    return networkInfo*;
 }
 
-char networkInfoSend(char networkInfo) {
+char networkInfoSend(char* networkInfo) {
 
     char strPrefix[] = "CIPSEND=0,";
     char toCharr[10];
-
-    int old_array_len = return_char_length(networkInfo);
+    int old_array_len[];
+    old_array_len = return_char_length(networkInfo);
     sprintf(toCharr, "%d", old_array_len);
     int new_array_len = 10 + return_char_length(toCharr);
 
@@ -1200,5 +1202,5 @@ char networkInfoSend(char networkInfo) {
             sendCommand[i] = toCharr[i - 10];
         }
     }
-    return sendCommand;
+    return sendCommand*;
 }

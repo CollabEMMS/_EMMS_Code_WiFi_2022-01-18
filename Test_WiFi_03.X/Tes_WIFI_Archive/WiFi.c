@@ -376,7 +376,8 @@ void wifi(bool init) {
                 networkInfo = networkInfoPrepared(networkInfo);
 
                 // create a sendable string for the wifiCommandSet
-                char sendCommand = networkInfoSend(networkInfo);
+                char sendCommand[];
+                sendCommand = networkInfoSend(networkInfo);
 
                 wifiCommandSet(sendCommand, true);
                 currentCommand = 3;

@@ -18,8 +18,7 @@
 
 #define BUF_LEN 250
 
-struct struct_buf
-{
+struct struct_buf {
     char buf[BUF_LEN];
     unsigned char posWrite;
     unsigned char posRead;
@@ -33,28 +32,28 @@ struct struct_buf bufRecvSPI;
 
 extern unsigned long timer_ms;
 
-void wifi( bool init );
-void wifiComm( void );
-void wifiCommandSet( char *command, bool addPrefix );
-void wifiServer( void );
-bool wifiResponseCheck( char* response, char* varOutput );
-bool wifiResponseEnd( void );
-void wifiCommSend( void );
-bool wifiCommSendChar( char data );
-bool wifiCommRecv( void );
-bool wifiCommRecvChar( char *data );
-void wifiInit( void );
+void wifi(bool init);
+void wifiComm(void);
+void wifiCommandSet(char *command, bool addPrefix);
+void wifiServer(void);
+bool wifiResponseCheck(char* response, char* varOutput);
+bool wifiResponseEnd(void);
+void wifiCommSend(void);
+bool wifiCommSendChar(char data);
+bool wifiCommRecv(void);
+bool wifiCommRecvChar(char *data);
+void wifiInit(void);
 
-bool spiCommRecvChar( char *data );
-bool spiCommRecv( void );
-bool spiCommSendChar( char data );
-void spiCommSend( void );
-void spiComm( void );
-bool spiResponseEnd( void );
-void spiCommandSet( char *command );
-void spiServer( void );
-void spi( bool init );
-void spiInit( void );
+bool spiCommRecvChar(char *data);
+bool spiCommRecv(void);
+bool spiCommSendChar(char data);
+void spiCommSend(void);
+void spiComm(void);
+bool spiResponseEnd(void);
+void spiCommandSet(char *command);
+void spiServer(void);
+void spi(bool init);
+void spiInit(void);
 void remove_all_chars(char* str, char c);
 int return_char_length(char* str);
 // Wifi-related variables
@@ -66,9 +65,7 @@ char ssidInfo[50] = "";
 bool getBuffer = false;
 int counter = 0;
 
-
-void wifiInit( )
-{
+void wifiInit() {
     ANSBbits.ANSB2 = 0;
 
     U1MODEbits.UARTEN = 0b0;
@@ -133,503 +130,446 @@ void wifiInit( )
     return;
 }
 
-void wifi( bool init )
-{
+void wifi(bool init) {
     // here we handle all things wifi
 
     static int stage = 0;
-    if( init == true )
-    {
-	bufSendWiFi.posRead = 0;
-	bufSendWiFi.posWrite = 0;
-	bufRecvWiFi.posRead = 0;
-	bufRecvWiFi.posWrite = 0;
-	stage = 0;
-	wifiInit( );
+    if (init == true) {
+        bufSendWiFi.posRead = 0;
+        bufSendWiFi.posWrite = 0;
+        bufRecvWiFi.posRead = 0;
+        bufRecvWiFi.posWrite = 0;
+        stage = 0;
+        wifiInit();
     }
-    wifiComm( );
-    
-//    volatile int currentCommand;// used to make sure specific data is sent in tcp response
-//    volatile int currentWiFiNetwork; // Used to quickly save the network that works, to prevent dropping off of wifi and long startup times
+    wifiComm();
 
-    switch( stage )   
-    {
-    case 0:
-    {
+    //    volatile int currentCommand;// used to make sure specific data is sent in tcp response
+    //    volatile int currentWiFiNetwork; // Used to quickly save the network that works, to prevent dropping off of wifi and long startup times
 
-    // reset and init 
-	// set command
-	wifiCommandSet( "RST", true );
-	stage++;
-	break;
-    }
-    case 1:
-	//wait for response
-	if( wifiResponseCheck( "ready" , "null") == true )
-	{
-	    stage++;
-	}
-    
-	break;
-    case 2:
-	wifiCommandSet( "RFPOWER=82", true );
-    stage++;
-	break;
-    case 3:
-	if( wifiResponseCheck( "OK", "null" ) == true )
-	{
-	    stage++;
-	}
-    if( wifiResponseCheck( "FAIL", "null" ) == true )
-	{
-	    stage = 0;
-	}
-	break;
-    case 4:
-        wifiCommandSet( "CWMODE_CUR=1", true );
-        stage++;
-	break;
-    case 5:
-	if( wifiResponseCheck( "OK", "null" ) == true )
-	{
-	    stage++;
-	}
-    if( wifiResponseCheck( "FAIL", "null" ) == true )
-	{
-	    stage = 0;
-	}
-	break;
-    case 6:
-	wifiCommandSet( "CWLAP", true );
-    //wifiCommandSet( "ATE0", false );
-	stage++;
-	break;
-    case 7:
-	if( wifiResponseCheck( "OK", "null" ) == true )
-	{
-	    stage++;
-	}
-    if( wifiResponseCheck( "FAIL", "null" ) == true )
-	{
-	    stage = 0;
-	}
-	break;
-    case 8:
-    {
-        wifiCommandSet( "CWJAP_CUR=\"EMMS-Zim2019\",\"emms-mahadaga\"", true );
-//        wifiCommandSet( "CWJAP_CUR=\"Messiah Guest\",\"\"", true );
-
-//        wifiCommandSet( "CWJAP_CUR=\"AW2\",\"*****\"", true ); // Not sure what this does
-        stage++;  
-    break;
-    }
-    case 9:
-    {
-    static int cautiousMuch = 0;
-    static int currentWiFiNetwork;
-	if( wifiResponseCheck( "OK" , "null") == true )
-	{
-	    stage++;
-	}
-    if( wifiResponseCheck( "FAIL", "null" ) == true || wifiResponseCheck( "ERROR", "null" ) == true) {
-//        if( cautiousMuch == 1 ) {
-//            stage = 0;
-//        } else 
-            if( cautiousMuch == 2)
+    switch (stage) {
+        case 0:
         {
-            stage = 0;
-        } else {
-        cautiousMuch = 0;
-        __delay_ms (1000);
-        if( currentWiFiNetwork == 1 ) {
-        currentWiFiNetwork = 0;
-        } else {
-        currentWiFiNetwork++;
+
+            // reset and init 
+            // set command
+            wifiCommandSet("RST", true);
+            stage++;
+            break;
         }
-        
-        
-        if( currentWiFiNetwork == 0 ) {
-            stage = 8;
-        }
-        if( currentWiFiNetwork == 1 ) {
-            stage = 20;
-        }
-        }
-    }
-    if( wifiResponseCheck( "WIFI CONNECTED", "null" ) == true ) 
-    {
-        cautiousMuch = 2;
-    }
-    if( wifiResponseCheck( "WIFI DISCONNECT", "null" ) == true)
-	{
-	    cautiousMuch = 1;
-	}
-    
-    if( wifiResponseCheck( "WIFI CONNECTED", "null" ) == true && cautiousMuch == 1)
-	{
-        cautiousMuch = 0;
-	    stage = 0;
-	}
-	break;
-    }
-    case 10:
-    getBuffer = true;
-    memset(&networkInfo[0], 0, sizeof(networkInfo));
-    counter = 0;
-	wifiCommandSet( "CIFSR", true );
-//    wifiCommandSet( "CIPAP=\"192.167.0.101\"", true );
-
-    stage++;
-	break;
-    case 11:
-
-	if( wifiResponseCheck( "OK", "null" ) == true )
-	{
-        getBuffer = false;
-	    stage++;
-	}
-    if( wifiResponseCheck( "FAIL", "null" ) == true )
-	{
-        getBuffer = false;
-	    stage = 0;
-	}
-    if( wifiResponseCheck( "ERROR", "null" ) == true )
-    {
-        getBuffer = false;
-        stage = 0;
-    }
-    
-	break;
-    case 12:
-	wifiCommandSet( "CIPMUX=1", true );
-    stage++;
-	break;
-    case 13:
-	if( wifiResponseCheck( "OK", "null" ) == true )
-	{
-	    stage++;
-	}
-    if( wifiResponseCheck( "FAIL", "null" ) == true )
-	{
-	    stage = 0;
-	}
-	break;
-    case 14:
-	wifiCommandSet( "CIPSERVER=0", true );
-    stage++;
-	break;
-    case 15:
-	if( wifiResponseCheck( "OK", "null" ) == true )
-	{
-	    stage++;
-	}
-    if( wifiResponseCheck( "FAIL", "null" ) == true )
-	{
-	    stage = 0;
-	}
-	break;
-    case 16:
-	wifiCommandSet( "CIPSERVER=1,80", true );
-    stage++;
-	break;
-    case 17:
-	if( wifiResponseCheck( "OK", "null" ) == true )
-	{
-	    stage++;
-	}
-    if( wifiResponseCheck( "FAIL", "null" ) == true )
-	{
-	    stage = 0;
-	}
-	break;
-    case 18:
-
-	    //	    spiCommandSet( "\r\nConnected!*" );
-//	    for( int inx = 0; inx < 40; inx++ )
-//	    {
-//		if( LED1READ == 0 )
-//		{
-//		    LED1SET = 1;
-//		    LED2SET = 1;
-//		}
-//		else
-//		{
-//		    LED1SET = 0;
-//		    LED2SET = 0;
-//		}
-//		__delay_ms( 10 );
-//		runone = true;
-//	    }
-//	    LED1SET = 0;
-//	    LED2SET = 0;
-	
-//    FLASHES FAST TO LET USER KNOW ITS INITIALIZED
-//    This should be to Show WIFI is ready to connect!
-    
-    for( int inx = 0; inx < 30; inx++ )
-    {
-	if( LED1READ == 0 )
-	{
-	    LED1SET = 1;
-	}
-	else
-	{
-	    LED1SET = 0;
-	}
-	__delay_ms( 30 );
-    }
-    LED1SET = 1;
-    LED3SET = 0;
-
-    // only do the light pulse once
-    wifiServer( );
-    stage++;
-    break;
-    case 19:
-    {
-    static int currentCommand = 0;
-        
-     if( wifiResponseCheck( "0,CONNECT", "null" ) == true) {
-        wifiCommandSet( "CIPSEND=0,31", true );
-        currentCommand = 1;
-     } else if( wifiResponseCheck( "OK", "null" ) == true ) {
-         if( currentCommand == 1) {
-            wifiCommandSet( "MESSIAH COLLEGE COLLABORATORY\n\r", false );
-            currentCommand = 0;
-         }
-     }
-     
-    // prints network info from cifsr
-     if( wifiResponseCheck( "+IPD,0,15:!MOD;NETWORK*", "null" ) == true ) {
-         // have it send variable of IP Shtuff from cifsr
-        remove_all_chars(networkInfo, '\n');
-        remove_all_chars(networkInfo, '\r');
-        remove_all_chars(networkInfo, '+');
-        remove_all_chars(networkInfo, '>');
-        remove_all_chars(networkInfo, '"');
-        char str[2] = "\n";
-        strcat(networkInfo, str);
-        char strPrefix[] = "CIPSEND=0,";
-        char toCharr[10];
-        int old_array_len = return_char_length(networkInfo);
-        sprintf(toCharr, "%d", old_array_len);
-        int new_array_len = 10 + return_char_length(toCharr);
-
-        char sendCommand[new_array_len];
-        for(int i =0; i < new_array_len; i++) {
-            if(i < 10) {
-                sendCommand[i] = strPrefix[i];
+        case 1:
+            //wait for response
+            if (wifiResponseCheck("ready", "null") == true) {
+                stage++;
             }
-            if( i >= 10 ) {
-                sendCommand[i] = toCharr[i-10];
+
+            break;
+        case 2:
+            wifiCommandSet("RFPOWER=82", true);
+            stage++;
+            break;
+        case 3:
+            if (wifiResponseCheck("OK", "null") == true) {
+                stage++;
             }
-        }
-        
-         wifiCommandSet( sendCommand, true );
-         currentCommand = 3;
-     } else if( wifiResponseCheck( "OK", "null" ) == true ) {
-         if( currentCommand == 3) {
-        wifiCommandSet( networkInfo, false );
-        currentCommand = 0;
-         }
-     }
+            if (wifiResponseCheck("FAIL", "null") == true) {
+                stage = 0;
+            }
+            break;
+        case 4:
+            wifiCommandSet("CWMODE_CUR=1", true);
+            stage++;
+            break;
+        case 5:
+            if (wifiResponseCheck("OK", "null") == true) {
+                stage++;
+            }
+            if (wifiResponseCheck("FAIL", "null") == true) {
+                stage = 0;
+            }
+            break;
+        case 6:
+            wifiCommandSet("CWLAP", true);
+            //wifiCommandSet( "ATE0", false );
+            stage++;
+            break;
+        case 7:
+            if (wifiResponseCheck("OK", "null") == true) {
+                stage++;
+            }
+            if (wifiResponseCheck("FAIL", "null") == true) {
+                stage = 0;
+            }
+            break;
+        case 8:
+        {
+            wifiCommandSet("CWJAP_CUR=\"EMMS-Zim2019\",\"emms-mahadaga\"", true);
+            //        wifiCommandSet( "CWJAP_CUR=\"Messiah Guest\",\"\"", true );
 
-     if( wifiResponseCheck( "+IPD,0,14:!MOD;CONFIG*", "null" ) == true ) {
-         // have it send variable of IP Shtuff from cifsr
-         wifiCommandSet( "CIPSEND=0,57", true );
-         currentCommand = 2;
-     } else if( wifiResponseCheck( "OK", "null" ) == true ) {
-         if( currentCommand == 2) {
-        wifiCommandSet( "EMMS Collaboratory Team;Spring 2019;WiFi V1.1;Meter #3\n", false );
-        currentCommand = 0;
-         }
-     }
-     
-     if( wifiResponseCheck( "+IPD,0,11:!MOD;CLOSE*", "null" ) == true ) {
-         // have it send variable of IP Shtuff from cifsr
-         wifiCommandSet( "CIPCLOSE=0", true );
-     }
-     
-     if( wifiResponseCheck( "+IPD,0,11:!MOD;RESET*", "null" ) == true ) {
-         // have it send variable of IP Shtuff from cifsr
-         wifiCommandSet( "CIPSEND=0,7", true );
-         currentCommand = 4;
-     } else if( wifiResponseCheck( "OK", "null" ) == true ) {
-        if( currentCommand == 4) {
-        wifiCommandSet( "Bye Bye", false );
-//        currentCommand = 0;
+            //        wifiCommandSet( "CWJAP_CUR=\"AW2\",\"*****\"", true ); // Not sure what this does
+            stage++;
+            break;
         }
-     } else if ( wifiResponseCheck( "SEND OK", "null" ) == true) {
-         if( currentCommand == 4 ) {
-        wifiCommandSet( "CIPCLOSE=0", true );
-        currentCommand = 0;
-        asm("RESET"); // Resets Pic
-         }
-        
+        case 9:
+        {
+            static int cautiousMuch = 0;
+            static int currentWiFiNetwork;
+            if (wifiResponseCheck("OK", "null") == true) {
+                stage++;
+            }
+            if (wifiResponseCheck("FAIL", "null") == true || wifiResponseCheck("ERROR", "null") == true) {
+                //        if( cautiousMuch == 1 ) {
+                //            stage = 0;
+                //        } else 
+                if (cautiousMuch == 2) {
+                    stage = 0;
+                } else {
+                    cautiousMuch = 0;
+                    __delay_ms(1000);
+                    if (currentWiFiNetwork == 1) {
+                        currentWiFiNetwork = 0;
+                    } else {
+                        currentWiFiNetwork++;
+                    }
+
+
+                    if (currentWiFiNetwork == 0) {
+                        stage = 8;
+                    }
+                    if (currentWiFiNetwork == 1) {
+                        stage = 20;
+                    }
+                }
+            }
+            if (wifiResponseCheck("WIFI CONNECTED", "null") == true) {
+                cautiousMuch = 2;
+            }
+            if (wifiResponseCheck("WIFI DISCONNECT", "null") == true) {
+                cautiousMuch = 1;
+            }
+
+            if (wifiResponseCheck("WIFI CONNECTED", "null") == true && cautiousMuch == 1) {
+                cautiousMuch = 0;
+                stage = 0;
+            }
+            break;
         }
-    
-    if( wifiResponseCheck( "WIFI DISCONNECT" , "null") == true )
-	{
-        // Means it Lost the Network
-        LED1SET = 0;
-        
-        U2TXREG = 'L';
-        __delay_ms( 50 );
-        U2TXREG = 'o';
-        __delay_ms( 50 );
-        U2TXREG = 's';
-        __delay_ms( 50 );
-        U2TXREG = 't';
-        __delay_ms( 50 );
-        U2TXREG = ' ';
-        __delay_ms( 50 );
-        U2TXREG = 'C';
-        __delay_ms( 50 );
-        U2TXREG = 'o';
-        __delay_ms( 50 );
-        U2TXREG = 'n';
-        __delay_ms( 50 );
-        U2TXREG = 'n';
-        __delay_ms( 50 );
-        U2TXREG = 'e';
-        __delay_ms( 50 );
-        U2TXREG = 'c';
-        __delay_ms( 50 );
-        U2TXREG = 't';
-        __delay_ms( 50 );
-        U2TXREG = 'i';
-        __delay_ms( 50 );
-        U2TXREG = 'o';
-        __delay_ms( 50 );
-        U2TXREG = 'n'; 
-        stage = 0;
-	}
-    break;
+        case 10:
+            getBuffer = true;
+            memset(&networkInfo[0], 0, sizeof (networkInfo));
+            counter = 0;
+            wifiCommandSet("CIFSR", true);
+            //    wifiCommandSet( "CIPAP=\"192.167.0.101\"", true );
+
+            stage++;
+            break;
+        case 11:
+
+            if (wifiResponseCheck("OK", "null") == true) {
+                getBuffer = false;
+                stage++;
+            }
+            if (wifiResponseCheck("FAIL", "null") == true) {
+                getBuffer = false;
+                stage = 0;
+            }
+            if (wifiResponseCheck("ERROR", "null") == true) {
+                getBuffer = false;
+                stage = 0;
+            }
+
+            break;
+        case 12:
+            wifiCommandSet("CIPMUX=1", true);
+            stage++;
+            break;
+        case 13:
+            if (wifiResponseCheck("OK", "null") == true) {
+                stage++;
+            }
+            if (wifiResponseCheck("FAIL", "null") == true) {
+                stage = 0;
+            }
+            break;
+        case 14:
+            wifiCommandSet("CIPSERVER=0", true);
+            stage++;
+            break;
+        case 15:
+            if (wifiResponseCheck("OK", "null") == true) {
+                stage++;
+            }
+            if (wifiResponseCheck("FAIL", "null") == true) {
+                stage = 0;
+            }
+            break;
+        case 16:
+            wifiCommandSet("CIPSERVER=1,80", true);
+            stage++;
+            break;
+        case 17:
+            if (wifiResponseCheck("OK", "null") == true) {
+                stage++;
+            }
+            if (wifiResponseCheck("FAIL", "null") == true) {
+                stage = 0;
+            }
+            break;
+        case 18:
+
+            //	    spiCommandSet( "\r\nConnected!*" );
+            //	    for( int inx = 0; inx < 40; inx++ )
+            //	    {
+            //		if( LED1READ == 0 )
+            //		{
+            //		    LED1SET = 1;
+            //		    LED2SET = 1;
+            //		}
+            //		else
+            //		{
+            //		    LED1SET = 0;
+            //		    LED2SET = 0;
+            //		}
+            //		__delay_ms( 10 );
+            //		runone = true;
+            //	    }
+            //	    LED1SET = 0;
+            //	    LED2SET = 0;
+
+            //    FLASHES FAST TO LET USER KNOW ITS INITIALIZED
+            //    This should be to Show WIFI is ready to connect!
+
+            for (int inx = 0; inx < 30; inx++) {
+                if (LED1READ == 0) {
+                    LED1SET = 1;
+                } else {
+                    LED1SET = 0;
+                }
+                __delay_ms(30);
+            }
+            LED1SET = 1;
+            LED3SET = 0;
+
+            // only do the light pulse once
+            wifiServer();
+            stage++;
+            break;
+        case 19:
+        {
+            static int currentCommand = 0;
+
+            if (wifiResponseCheck("0,CONNECT", "null") == true) {
+                wifiCommandSet("CIPSEND=0,31", true);
+                currentCommand = 1;
+            } else if (wifiResponseCheck("OK", "null") == true) {
+                if (currentCommand == 1) {
+                    wifiCommandSet("MESSIAH COLLEGE COLLABORATORY\n\r", false);
+                    currentCommand = 0;
+                }
+            }
+
+            // prints network info from cifsr
+            if (wifiResponseCheck("+IPD,0,15:!MOD;NETWORK*", "null") == true) {
+                // have it send variable of IP Shtuff from cifsr
+
+                // removes unnecessary characters and prepares to send
+                networkInfo = networkInfoPrepared(networkInfo);
+
+                // create a sendable string for the wifiCommandSet
+                char sendCommand = networkInfoSend(networkInfo);
+
+                wifiCommandSet(sendCommand, true);
+                currentCommand = 3;
+            } else if (wifiResponseCheck("OK", "null") == true) {
+                if (currentCommand == 3) {
+                    wifiCommandSet(networkInfo, false);
+                    currentCommand = 0;
+                }
+            }
+
+            if (wifiResponseCheck("+IPD,0,14:!MOD;CONFIG*", "null") == true) {
+                // have it send variable of IP Shtuff from cifsr
+                wifiCommandSet("CIPSEND=0,57", true);
+                currentCommand = 2;
+            } else if (wifiResponseCheck("OK", "null") == true) {
+                if (currentCommand == 2) {
+                    wifiCommandSet("EMMS Collaboratory Team;Spring 2019;WiFi V1.1;Meter #3\n", false);
+                    currentCommand = 0;
+                }
+            }
+
+            if (wifiResponseCheck("+IPD,0,11:!MOD;CLOSE*", "null") == true) {
+                // have it send variable of IP Shtuff from cifsr
+                wifiCommandSet("CIPCLOSE=0", true);
+            }
+
+            if (wifiResponseCheck("+IPD,0,11:!MOD;RESET*", "null") == true) {
+                // have it send variable of IP Shtuff from cifsr
+                wifiCommandSet("CIPSEND=0,7", true);
+                currentCommand = 4;
+            } else if (wifiResponseCheck("OK", "null") == true) {
+                if (currentCommand == 4) {
+                    wifiCommandSet("Bye Bye", false);
+                    //        currentCommand = 0;
+                }
+            } else if (wifiResponseCheck("SEND OK", "null") == true) {
+                if (currentCommand == 4) {
+                    wifiCommandSet("CIPCLOSE=0", true);
+                    currentCommand = 0;
+                    asm("RESET"); // Resets Pic
+                }
+
+            }
+
+            if (wifiResponseCheck("WIFI DISCONNECT", "null") == true) {
+                // Means it Lost the Network
+                LED1SET = 0;
+
+                U2TXREG = 'L';
+                __delay_ms(50);
+                U2TXREG = 'o';
+                __delay_ms(50);
+                U2TXREG = 's';
+                __delay_ms(50);
+                U2TXREG = 't';
+                __delay_ms(50);
+                U2TXREG = ' ';
+                __delay_ms(50);
+                U2TXREG = 'C';
+                __delay_ms(50);
+                U2TXREG = 'o';
+                __delay_ms(50);
+                U2TXREG = 'n';
+                __delay_ms(50);
+                U2TXREG = 'n';
+                __delay_ms(50);
+                U2TXREG = 'e';
+                __delay_ms(50);
+                U2TXREG = 'c';
+                __delay_ms(50);
+                U2TXREG = 't';
+                __delay_ms(50);
+                U2TXREG = 'i';
+                __delay_ms(50);
+                U2TXREG = 'o';
+                __delay_ms(50);
+                U2TXREG = 'n';
+                stage = 0;
+            }
+            break;
+        }
+        case 20:
+            __delay_ms(70);
+            //        wifiCommandSet( "CWJAP_CUR=\"Messiah Guest\",\"\"", true );
+            wifiCommandSet("CWJAP_CUR=\"EMMS-Meters\",\"emms_meters\"", true);
+
+            stage = 9;
     }
-    case 20:
-        __delay_ms( 70 );
-//        wifiCommandSet( "CWJAP_CUR=\"Messiah Guest\",\"\"", true );
-        wifiCommandSet( "CWJAP_CUR=\"EMMS-Meters\",\"emms_meters\"", true );
-
-        stage = 9;
-    }
 
 
 
-    if( wifiResponseEnd( ) == true )
-    {
-	bufRecvWiFi.posRead = 0;
-	bufRecvWiFi.posWrite = 0;
+    if (wifiResponseEnd() == true) {
+        bufRecvWiFi.posRead = 0;
+        bufRecvWiFi.posWrite = 0;
     }
 
 }
 
-void wifiServer( void )
-{
+void wifiServer(void) {
 
     int inPort = 0;
     int inDataLen = 0;
 
     // check the buffers and see if we have a command
-    if( wifiResponseEnd( ) == true )
-    {
-	// check if data came in
-	if( strncmp( "+IPD,", bufRecvWiFi.buf, 5 ) == 0 )
-	{
-	    // get the port
+    if (wifiResponseEnd() == true) {
+        // check if data came in
+        if (strncmp("+IPD,", bufRecvWiFi.buf, 5) == 0) {
+            // get the port
 #define ESP_BUF_IPD_START_PORT 5
 #define ESP_BUF_IPD_START_LEN 7
-	    char tmpbuf[3];
+            char tmpbuf[3];
 
-	    tmpbuf[0] = bufRecvWiFi.buf[ESP_BUF_IPD_START_PORT];
-	    tmpbuf[1] = CHAR_NULL;
+            tmpbuf[0] = bufRecvWiFi.buf[ESP_BUF_IPD_START_PORT];
+            tmpbuf[1] = CHAR_NULL;
 
-	    inPort = atoi( tmpbuf );
+            inPort = atoi(tmpbuf);
 
-	    tmpbuf[0] = bufRecvWiFi.buf[ESP_BUF_IPD_START_LEN];
-	    switch( bufRecvWiFi.buf[ESP_BUF_IPD_START_LEN + 1] )
-	    {
-	    case ':':
-		tmpbuf[1] = CHAR_NULL;
-		bufRecvWiFi.posRead = 9;
-		break;
-	    default:
-		tmpbuf[1] = bufRecvWiFi.buf[ESP_BUF_IPD_START_LEN + 1];
-		tmpbuf[2] = CHAR_NULL;
-		bufRecvWiFi.posRead = 10;
-		break;
-	    }
+            tmpbuf[0] = bufRecvWiFi.buf[ESP_BUF_IPD_START_LEN];
+            switch (bufRecvWiFi.buf[ESP_BUF_IPD_START_LEN + 1]) {
+                case ':':
+                    tmpbuf[1] = CHAR_NULL;
+                    bufRecvWiFi.posRead = 9;
+                    break;
+                default:
+                    tmpbuf[1] = bufRecvWiFi.buf[ESP_BUF_IPD_START_LEN + 1];
+                    tmpbuf[2] = CHAR_NULL;
+                    bufRecvWiFi.posRead = 10;
+                    break;
+            }
 
-	    inDataLen = atoi( tmpbuf );
+            inDataLen = atoi(tmpbuf);
 
-	    // we make things here static in case a command spans multiple data packets from the esp8266
-	    static bool inCommand = false;
+            // we make things here static in case a command spans multiple data packets from the esp8266
+            static bool inCommand = false;
 #define ESP_BUF_IPD_COMMAND_PROCESS_SIZE 200
-	    static char bufRecvWiFiCommand[ ESP_BUF_IPD_COMMAND_PROCESS_SIZE ];
-	    static int bufRecvWiFiCommandPos = 0;
+            static char bufRecvWiFiCommand[ ESP_BUF_IPD_COMMAND_PROCESS_SIZE ];
+            static int bufRecvWiFiCommandPos = 0;
 
-	    bufRecvWiFiCommandPos = 0;
+            bufRecvWiFiCommandPos = 0;
 
 
-	    while( bufRecvWiFi.buf[bufRecvWiFi.posRead ] != CHAR_NULL )
-	    {
-		if( inCommand == false )
-		{
-		    if( bufRecvWiFi.buf[bufRecvWiFi.posRead] == '!' )
-		    {
-			inCommand = true;
+            while (bufRecvWiFi.buf[bufRecvWiFi.posRead ] != CHAR_NULL) {
+                if (inCommand == false) {
+                    if (bufRecvWiFi.buf[bufRecvWiFi.posRead] == '!') {
+                        inCommand = true;
 
-			//			if( LED1READ == 0 )
-			//			{
-			//			    LED1SET = 1;
-			//			}
-			//			else
-			//			{
-			//			    LED1SET = 0;
-			//			}
-		    }
-		}
+                        //			if( LED1READ == 0 )
+                        //			{
+                        //			    LED1SET = 1;
+                        //			}
+                        //			else
+                        //			{
+                        //			    LED1SET = 0;
+                        //			}
+                    }
+                }
 
-		if( inCommand == true )
-		{
-		    bufRecvWiFiCommand[bufRecvWiFiCommandPos] = bufRecvWiFi.buf[bufRecvWiFi.posRead ];
-		    bufRecvWiFiCommandPos++;
-		    if( bufRecvWiFiCommandPos >= ESP_BUF_IPD_COMMAND_PROCESS_SIZE )
-		    {
-			bufRecvWiFiCommandPos = (ESP_BUF_IPD_COMMAND_PROCESS_SIZE - 1);
-		    }
+                if (inCommand == true) {
+                    bufRecvWiFiCommand[bufRecvWiFiCommandPos] = bufRecvWiFi.buf[bufRecvWiFi.posRead ];
+                    bufRecvWiFiCommandPos++;
+                    if (bufRecvWiFiCommandPos >= ESP_BUF_IPD_COMMAND_PROCESS_SIZE) {
+                        bufRecvWiFiCommandPos = (ESP_BUF_IPD_COMMAND_PROCESS_SIZE - 1);
+                    }
 
-		    if( bufRecvWiFi.buf[bufRecvWiFi.posRead ] == '*' )
-		    {
-//			if( LED2READ == 0 )
-//			{
-//			    LED2SET = 1;
-//			}
-//			else
-//			{
-//			    LED2SET = 0;
-//			}
+                    if (bufRecvWiFi.buf[bufRecvWiFi.posRead ] == '*') {
+                        //			if( LED2READ == 0 )
+                        //			{
+                        //			    LED2SET = 1;
+                        //			}
+                        //			else
+                        //			{
+                        //			    LED2SET = 0;
+                        //			}
 
-			bufRecvWiFiCommand[bufRecvWiFiCommandPos] = CHAR_NULL;
-			inCommand = false;
+                        bufRecvWiFiCommand[bufRecvWiFiCommandPos] = CHAR_NULL;
+                        inCommand = false;
 
-			spiCommandSet( bufRecvWiFiCommand );
-			bufRecvWiFiCommandPos = 0;
-		    }
-		}
-		bufRecvWiFi.posRead++;
+                        spiCommandSet(bufRecvWiFiCommand);
+                        bufRecvWiFiCommandPos = 0;
+                    }
+                }
+                bufRecvWiFi.posRead++;
 
-	    }
-	}
-	bufRecvWiFi.posRead = 0;
-	bufRecvWiFi.posWrite = 0;
+            }
+        }
+        bufRecvWiFi.posRead = 0;
+        bufRecvWiFi.posWrite = 0;
 
 
     }
 }
 
-void wifiCommandAdd( char *addCommand )
-{
+void wifiCommandAdd(char *addCommand) {
     //AT+CIPSENDBUF=<link ID>,<length>
 
     const char *commandDataPrefix = "CIPSEND=";
@@ -641,15 +581,13 @@ void wifiCommandAdd( char *addCommand )
     inx = 0;
     inxtemp = 0;
 
-    while( commandDataPrefix[inx] != CHAR_NULL )
-    {
-	temp[inxtemp] = commandDataPrefix[inx];
-	inxtemp++;
-	if( inxtemp >= BUF_LEN )
-	{
-	    inxtemp = (BUF_LEN - 1);
-	}
-	inx++;
+    while (commandDataPrefix[inx] != CHAR_NULL) {
+        temp[inxtemp] = commandDataPrefix[inx];
+        inxtemp++;
+        if (inxtemp >= BUF_LEN) {
+            inxtemp = (BUF_LEN - 1);
+        }
+        inx++;
     }
 
     temp[inxtemp] = '0';
@@ -661,525 +599,440 @@ void wifiCommandAdd( char *addCommand )
     // need the length of addCommand
     int dataLen = 0;
 
-    while( addCommand[dataLen] != '*' )
-    {
-	dataLen++;
+    while (addCommand[dataLen] != '*') {
+        dataLen++;
     }
     dataLen++; // we need to add one since this is a count, not index
 
     char dataLenChar[5];
 
-    itoa( dataLenChar, dataLen, 10 );
+    itoa(dataLenChar, dataLen, 10);
 
     inx = 0;
-    while( dataLenChar[inx] != CHAR_NULL )
-    {
-	temp[inxtemp] = dataLenChar[inx];
-	inxtemp++;
-	inx++;
+    while (dataLenChar[inx] != CHAR_NULL) {
+        temp[inxtemp] = dataLenChar[inx];
+        inxtemp++;
+        inx++;
     }
 
     temp[inxtemp] = CHAR_NULL;
-    wifiCommandSet( temp, true );
+    wifiCommandSet(temp, true);
 
     bufSendWiFi.buf[ bufSendWiFi.posWrite] = CHAR_NULL;
     bufSendWiFi.posWrite++;
-    if( bufSendWiFi.posWrite >= BUF_LEN )
-    {
-	bufSendWiFi.posWrite = (BUF_LEN - 1);
+    if (bufSendWiFi.posWrite >= BUF_LEN) {
+        bufSendWiFi.posWrite = (BUF_LEN - 1);
     }
 
     inx = 0;
-    while( addCommand[inx] != '*' )
-    {
-	bufSendWiFi.buf[ bufSendWiFi.posWrite] = addCommand[inx];
-	bufSendWiFi.posWrite++;
-	if( bufSendWiFi.posWrite >= BUF_LEN )
-	{
-	    bufSendWiFi.posWrite = (BUF_LEN - 1);
-	}
-	inx++;
+    while (addCommand[inx] != '*') {
+        bufSendWiFi.buf[ bufSendWiFi.posWrite] = addCommand[inx];
+        bufSendWiFi.posWrite++;
+        if (bufSendWiFi.posWrite >= BUF_LEN) {
+            bufSendWiFi.posWrite = (BUF_LEN - 1);
+        }
+        inx++;
     }
 
     bufSendWiFi.buf[ bufSendWiFi.posWrite] = '*';
     bufSendWiFi.posWrite++;
-    if( bufSendWiFi.posWrite >= BUF_LEN )
-    {
-	bufSendWiFi.posWrite = (BUF_LEN - 1);
+    if (bufSendWiFi.posWrite >= BUF_LEN) {
+        bufSendWiFi.posWrite = (BUF_LEN - 1);
     }
 
     return;
 
 }
 
-void wifiCommandSet( char *command, bool addPrefix )
-{
+void wifiCommandSet(char *command, bool addPrefix) {
     int inx;
 
     const char *commandPrefix = "AT+";
     const char *commandPostfix = "\r\n";
 
-    if( addPrefix == true )
-    {
-	inx = 0;
-	while( commandPrefix [inx] != CHAR_NULL )
-	{
-	    bufSendWiFi.buf[ bufSendWiFi.posWrite] = commandPrefix[inx];
-	    bufSendWiFi.posWrite++;
-	    if( bufSendWiFi.posWrite >= BUF_LEN )
-	    {
-		bufSendWiFi.posWrite = (BUF_LEN - 1);
-	    }
-	    inx++;
-	}
+    if (addPrefix == true) {
+        inx = 0;
+        while (commandPrefix [inx] != CHAR_NULL) {
+            bufSendWiFi.buf[ bufSendWiFi.posWrite] = commandPrefix[inx];
+            bufSendWiFi.posWrite++;
+            if (bufSendWiFi.posWrite >= BUF_LEN) {
+                bufSendWiFi.posWrite = (BUF_LEN - 1);
+            }
+            inx++;
+        }
     }
 
     inx = 0;
-    while( command[inx] != CHAR_NULL )
-    {
-	bufSendWiFi.buf[bufSendWiFi.posWrite] = command[inx];
-	bufSendWiFi.posWrite++;
-	if( bufSendWiFi.posWrite >= BUF_LEN )
-	{
-	    bufSendWiFi.posWrite = (BUF_LEN - 1);
-	}
-	inx++;
+    while (command[inx] != CHAR_NULL) {
+        bufSendWiFi.buf[bufSendWiFi.posWrite] = command[inx];
+        bufSendWiFi.posWrite++;
+        if (bufSendWiFi.posWrite >= BUF_LEN) {
+            bufSendWiFi.posWrite = (BUF_LEN - 1);
+        }
+        inx++;
     }
 
     inx = 0;
-    while( commandPostfix [inx] != CHAR_NULL )
-    {
-	bufSendWiFi.buf[ bufSendWiFi.posWrite] = commandPostfix[inx];
-	bufSendWiFi.posWrite++;
-	if( bufSendWiFi.posWrite >= BUF_LEN )
-	{
-	    bufSendWiFi.posWrite = (BUF_LEN - 1);
-	}
-	inx++;
+    while (commandPostfix [inx] != CHAR_NULL) {
+        bufSendWiFi.buf[ bufSendWiFi.posWrite] = commandPostfix[inx];
+        bufSendWiFi.posWrite++;
+        if (bufSendWiFi.posWrite >= BUF_LEN) {
+            bufSendWiFi.posWrite = (BUF_LEN - 1);
+        }
+        inx++;
     }
 
     return;
 
 }
 
-bool wifiResponseCheck( char* response, char* varOutput )
-{
+bool wifiResponseCheck(char* response, char* varOutput) {
     bool match = false;
     bool varmatch = false;
     bool keepBuffer = false;
-    
+
     char doNothingChar[] = "null";
     char ipAddr[] = "ipAddr";
     char networkInfo[] = "networkInfo";
     char macAddr[] = "macAddr";
     char ssidInfo[] = "ssidInfo";
     char flush[] = "flush";
-    
+
     int i = strcmp(doNothingChar, varOutput);
-    
-    if( i != 0 )
-    {
+
+    if (i != 0) {
         keepBuffer = true;
     }
-    
-    
-    if( wifiResponseEnd( ) == true )
-    {
-	match = true;
-    varmatch = true;
-	int inx = 0;
-	while( (response[inx] != CHAR_NULL) && (match == true) )
-	{
-	    
-        // Checks response against incoming wifi stream
-        if( response[inx] != bufRecvWiFi.buf[inx] )
-	    {
-		match = false;
-	    }
-        
-        if( keepBuffer == true ) 
-        {
-            if ( strcmp(ipAddr, varOutput) == 0 || strcmp(macAddr, varOutput) == 0 || strcmp(networkInfo, varOutput) == 0 || strcmp(ssidInfo, varOutput) == 0){
-//            U2TXREG = '%';
-//            networkInfo[inx] += bufRecvWiFi.buf[inx];
+
+
+    if (wifiResponseEnd() == true) {
+        match = true;
+        varmatch = true;
+        int inx = 0;
+        while ((response[inx] != CHAR_NULL) && (match == true)) {
+
+            // Checks response against incoming wifi stream
+            if (response[inx] != bufRecvWiFi.buf[inx]) {
+                match = false;
             }
-            i = strcmp(flush, varOutput);
-            if( i == 0) {
-                U2TXREG = 'F';
-                U2TXREG = 'l';
-                U2TXREG = 'u';
-                U2TXREG = 's';
-                U2TXREG = 'h';
-                U2TXREG = 'e';
-                U2TXREG = 'd';
-                
-                networkInfo[inx] = ' ';
-                ipAddr[inx] = ' ';
-                macAddr[inx] = ' ';
-                ssidInfo[inx] = ' ';
+
+            if (keepBuffer == true) {
+                if (strcmp(ipAddr, varOutput) == 0 || strcmp(macAddr, varOutput) == 0 || strcmp(networkInfo, varOutput) == 0 || strcmp(ssidInfo, varOutput) == 0) {
+                    //            U2TXREG = '%';
+                    //            networkInfo[inx] += bufRecvWiFi.buf[inx];
+                }
+                i = strcmp(flush, varOutput);
+                if (i == 0) {
+                    U2TXREG = 'F';
+                    U2TXREG = 'l';
+                    U2TXREG = 'u';
+                    U2TXREG = 's';
+                    U2TXREG = 'h';
+                    U2TXREG = 'e';
+                    U2TXREG = 'd';
+
+                    networkInfo[inx] = ' ';
+                    ipAddr[inx] = ' ';
+                    macAddr[inx] = ' ';
+                    ssidInfo[inx] = ' ';
+                }
             }
+
+            inx++;
         }
-        
-	    inx++;
-	}
-    
-    
+
+
     }
 
     return match;
 }
 
-bool wifiResponseEnd( void )
-{
+bool wifiResponseEnd(void) {
     bool responseEnd = false;
-    
-    
-    
-    if( bufRecvWiFi.posWrite >= 2 )
-    {
-	if( bufRecvWiFi.buf[bufRecvWiFi.posWrite - 2] == CHAR_CR )
-	{
-	    if( bufRecvWiFi.buf[bufRecvWiFi.posWrite - 1] == CHAR_NEW_LINE )
-	    {
-		responseEnd = true;
-	    }
 
 
-	}
+
+    if (bufRecvWiFi.posWrite >= 2) {
+        if (bufRecvWiFi.buf[bufRecvWiFi.posWrite - 2] == CHAR_CR) {
+            if (bufRecvWiFi.buf[bufRecvWiFi.posWrite - 1] == CHAR_NEW_LINE) {
+                responseEnd = true;
+            }
+
+
+        }
     }
 
     return responseEnd;
 }
 
-void wifiComm( )
-{
-    wifiCommSend( );
-    wifiCommRecv( );
+void wifiComm() {
+    wifiCommSend();
+    wifiCommRecv();
 
     return;
 }
 
-void wifiCommSend( void )
-{
-    if( bufSendWiFi.posRead != bufSendWiFi.posWrite )
-    {
-	if( U1STAbits.UTXBF == 0 )
-	{
-	    if( wifiCommSendChar( bufSendWiFi.buf[bufSendWiFi.posRead] ) == true )
-	    {
-		bufSendWiFi.posRead++;
-		if( bufSendWiFi.posRead >= BUF_LEN )
-		{
-		    bufSendWiFi.posRead = 0;
-		}
-	    }
-	}
-    }
-    else
-    {
-	bufSendWiFi.posRead = 0;
-	bufSendWiFi.posWrite = 0;
+void wifiCommSend(void) {
+    if (bufSendWiFi.posRead != bufSendWiFi.posWrite) {
+        if (U1STAbits.UTXBF == 0) {
+            if (wifiCommSendChar(bufSendWiFi.buf[bufSendWiFi.posRead]) == true) {
+                bufSendWiFi.posRead++;
+                if (bufSendWiFi.posRead >= BUF_LEN) {
+                    bufSendWiFi.posRead = 0;
+                }
+            }
+        }
+    } else {
+        bufSendWiFi.posRead = 0;
+        bufSendWiFi.posWrite = 0;
     }
     return;
 }
 
-bool wifiCommSendChar( char data )
-{
+bool wifiCommSendChar(char data) {
     bool dataSent = false;
     static bool pause = false;
     static unsigned long pauseTimer;
     static bool pauseTimerOverflowWait;
 #define PAUSE_TIME_MS 100
 
-    if( pause == false )
-    {
-	if( data == CHAR_NULL )
-	{
-	    pause = true;
-	    if( (ULONG_MAX - timer_ms) > PAUSE_TIME_MS )
-	    {
-		pauseTimer = timer_ms + PAUSE_TIME_MS;
-	    }
-	    else
-	    {
-		pauseTimer = PAUSE_TIME_MS - (ULONG_MAX - timer_ms);
-		pauseTimerOverflowWait = true;
-	    }
+    if (pause == false) {
+        if (data == CHAR_NULL) {
+            pause = true;
+            if ((ULONG_MAX - timer_ms) > PAUSE_TIME_MS) {
+                pauseTimer = timer_ms + PAUSE_TIME_MS;
+            } else {
+                pauseTimer = PAUSE_TIME_MS - (ULONG_MAX - timer_ms);
+                pauseTimerOverflowWait = true;
+            }
 
-	    dataSent = true;
-	}
-	else
-	{
-	    if( U1STAbits.UTXBF == 0 )
-	    {
-		U1TXREG = data;
-		dataSent = true;
-		U2TXREG = data;
-        
-        // Flashes at UART Communication
-        if( LED3READ == 0 )
-		    {
-			LED3SET = 1;
-		    }
-		 else
-		    {
-			LED3SET = 0;
-		    }
-	    }
-	}
-    }
-    else
-    {
-	if( pauseTimerOverflowWait == true )
-	{
-	    if( timer_ms < pauseTimer )
-	    {
-		pauseTimerOverflowWait = false;
-	    }
-	}
+            dataSent = true;
+        } else {
+            if (U1STAbits.UTXBF == 0) {
+                U1TXREG = data;
+                dataSent = true;
+                U2TXREG = data;
 
-	if( pauseTimerOverflowWait == false )
-	{
-	    if( timer_ms >= pauseTimer )
-	    {
-		pause = false;
-	    }
-	}
+                // Flashes at UART Communication
+                if (LED3READ == 0) {
+                    LED3SET = 1;
+                } else {
+                    LED3SET = 0;
+                }
+            }
+        }
+    } else {
+        if (pauseTimerOverflowWait == true) {
+            if (timer_ms < pauseTimer) {
+                pauseTimerOverflowWait = false;
+            }
+        }
+
+        if (pauseTimerOverflowWait == false) {
+            if (timer_ms >= pauseTimer) {
+                pause = false;
+            }
+        }
     }
     return dataSent;
 }
 
-bool wifiCommRecv( void )
-{
+bool wifiCommRecv(void) {
     bool dataReceived = false;
     char data;
 
-    if( wifiCommRecvChar( &data ) == true )
-    {
-	bufRecvWiFi.buf[bufRecvWiFi.posWrite] = data;
-	dataReceived = true;
-	bufRecvWiFi.posWrite++;
-	if( bufRecvWiFi.posWrite >= BUF_LEN )
-	{
-	    bufRecvWiFi.posWrite = 0;
-	}
-	bufRecvWiFi.buf[bufRecvWiFi.posWrite] = CHAR_NULL;
+    if (wifiCommRecvChar(&data) == true) {
+        bufRecvWiFi.buf[bufRecvWiFi.posWrite] = data;
+        dataReceived = true;
+        bufRecvWiFi.posWrite++;
+        if (bufRecvWiFi.posWrite >= BUF_LEN) {
+            bufRecvWiFi.posWrite = 0;
+        }
+        bufRecvWiFi.buf[bufRecvWiFi.posWrite] = CHAR_NULL;
     }
 
     return dataReceived;
 }
 
-bool wifiCommRecvChar( char *data )
-{
+bool wifiCommRecvChar(char *data) {
     bool dataReceived = false;
-    if( U1STAbits.URXDA == 1 )
-    {
-	*data = U1RXREG;
-	dataReceived = true;
-	U2TXREG = *data;
-    if( getBuffer == true ) {  
-        networkInfo[counter] = *data;
-        counter ++;
-    }
-    if( counter == 101 )
-    {
-        counter = 0;
-    }
-    
-    // Flashes at UART Communication
-    if( LED3READ == 0 )
-		    {
-			LED3SET = 1;
-		    }
-		 else
-		    {
-			LED3SET = 0;
-		    }
+    if (U1STAbits.URXDA == 1) {
+        *data = U1RXREG;
+        dataReceived = true;
+        U2TXREG = *data;
+        if (getBuffer == true) {
+            networkInfo[counter] = *data;
+            counter++;
+        }
+        if (counter == 101) {
+            counter = 0;
+        }
+
+        // Flashes at UART Communication
+        if (LED3READ == 0) {
+            LED3SET = 1;
+        } else {
+            LED3SET = 0;
+        }
     }
     return dataReceived;
 }
 
-void spi( bool init )
-{
-    if( init == true )
-    {
-	bufSendSPI.posRead = 0;
-	bufSendSPI.posWrite = 0;
-	bufRecvSPI.posRead = 0;
-	bufRecvSPI.posWrite = 0;
-	spiInit( );
-	U2TXREG = '\r';
-	__delay_ms( 100 );
-	U2TXREG = 'S';
-	__delay_ms( 10 );
-    U2TXREG = 'P';
-	__delay_ms( 10 );
-    U2TXREG = 'I';
-	__delay_ms( 10 );
-    U2TXREG = '\r';
-	__delay_ms( 10 );
-    U2TXREG = 'E';
-	__delay_ms( 10 );
-    U2TXREG = 'n';
-	__delay_ms( 10 );
-    U2TXREG = 'a';
-	__delay_ms( 10 );
-    U2TXREG = 'b';
-	__delay_ms( 10 );
-    U2TXREG = 'l';
-	__delay_ms( 10 );
-    U2TXREG = 'e';
-	__delay_ms( 10 );
-    U2TXREG = 'd';
-	__delay_ms( 10 );
-    
-    
-//    FLASHES FAST TO LET USER KNOW ITS INITIALIZED
-//    This should be first blink after Boot Sequence
-    
-    for( int inx = 0; inx < 30; inx++ )
-    {
-	if( LED2READ == 0 )
-	{
-	    LED2SET = 1;
-	}
-	else
-	{
-	    LED2SET = 0;
-	}
-	__delay_ms( 30 );
-    }
-    
-    
+void spi(bool init) {
+    if (init == true) {
+        bufSendSPI.posRead = 0;
+        bufSendSPI.posWrite = 0;
+        bufRecvSPI.posRead = 0;
+        bufRecvSPI.posWrite = 0;
+        spiInit();
+        U2TXREG = '\r';
+        __delay_ms(100);
+        U2TXREG = 'S';
+        __delay_ms(10);
+        U2TXREG = 'P';
+        __delay_ms(10);
+        U2TXREG = 'I';
+        __delay_ms(10);
+        U2TXREG = '\r';
+        __delay_ms(10);
+        U2TXREG = 'E';
+        __delay_ms(10);
+        U2TXREG = 'n';
+        __delay_ms(10);
+        U2TXREG = 'a';
+        __delay_ms(10);
+        U2TXREG = 'b';
+        __delay_ms(10);
+        U2TXREG = 'l';
+        __delay_ms(10);
+        U2TXREG = 'e';
+        __delay_ms(10);
+        U2TXREG = 'd';
+        __delay_ms(10);
+
+
+        //    FLASHES FAST TO LET USER KNOW ITS INITIALIZED
+        //    This should be first blink after Boot Sequence
+
+        for (int inx = 0; inx < 30; inx++) {
+            if (LED2READ == 0) {
+                LED2SET = 1;
+            } else {
+                LED2SET = 0;
+            }
+            __delay_ms(30);
+        }
+
+
     } // END OF IF SPI(TRUE) condition
 
-    
-//    SPI initialization error control (?)
+
+    //    SPI initialization error control (?)
     static bool spiInReset = false;
-    if( PORTBbits.RB15 == 1 ) // Set Chip Sel to input // Changed from rb12 (ss2) 
+    if (PORTBbits.RB15 == 1) // Set Chip Sel to input // Changed from rb12 (ss2) 
     {
-	if( spiInReset == false )
-	{
-	    spiInReset = true;
-	    SPI1STATbits.SPIEN = 0; //disable SPI
-	}
-    }
-    else
-    {
-	if( spiInReset == true ) // One shot
-	{
-	    spiInReset = false;
-	    bufRecvSPI.posRead = 0;
-	    bufRecvSPI.posWrite = 0;
-	    // spiCommandSet( "!Set;Watts;55*" );
-	    SPI1STATbits.SPIEN = 1; //enable SPI
-	}
-// This is running every clock cycle
-	spiComm( );
-	spiServer( );
+        if (spiInReset == false) {
+            spiInReset = true;
+            SPI1STATbits.SPIEN = 0; //disable SPI
+        }
+    } else {
+        if (spiInReset == true) // One shot
+        {
+            spiInReset = false;
+            bufRecvSPI.posRead = 0;
+            bufRecvSPI.posWrite = 0;
+            // spiCommandSet( "!Set;Watts;55*" );
+            SPI1STATbits.SPIEN = 1; //enable SPI
+        }
+        // This is running every clock cycle
+        spiComm();
+        spiServer();
 
-	// here we need to check if we pass on a command
+        // here we need to check if we pass on a command
 
-	if( spiResponseEnd( ) == true )
-	{
-	    bufRecvSPI.posRead = 0;
-	    bufRecvSPI.posWrite = 0;
-	}
+        if (spiResponseEnd() == true) {
+            bufRecvSPI.posRead = 0;
+            bufRecvSPI.posWrite = 0;
+        }
     }
 }
 
-void spiServer( )
-{
+void spiServer() {
 
     // check the buffers and see if we have a command
-    if( spiResponseEnd( ) == true )
-    {
-//        LED3SET = 1;
+    if (spiResponseEnd() == true) {
+        //        LED3SET = 1;
 
-	if( bufRecvSPI.buf[0] == '!' )
-	{
-//	    LED3SET = 1;
-	    wifiCommandAdd( bufRecvSPI.buf );
-	}
+        if (bufRecvSPI.buf[0] == '!') {
+            //	    LED3SET = 1;
+            wifiCommandAdd(bufRecvSPI.buf);
+        }
     }
 }
 
-void spiCommandSet( char *command )
-{
+void spiCommandSet(char *command) {
     int inx;
     inx = 0;
-    while( command[inx] != '*' )
-    {
-	//LED1SET = 1;
-	bufSendSPI.buf[bufSendSPI.posWrite] = command[inx];
-	bufSendSPI.posWrite++;
-	if( bufSendSPI.posWrite >= BUF_LEN )
-	{
-	    bufSendSPI.posWrite = (BUF_LEN - 1);
-	}
-	inx++;
+    while (command[inx] != '*') {
+        //LED1SET = 1;
+        bufSendSPI.buf[bufSendSPI.posWrite] = command[inx];
+        bufSendSPI.posWrite++;
+        if (bufSendSPI.posWrite >= BUF_LEN) {
+            bufSendSPI.posWrite = (BUF_LEN - 1);
+        }
+        inx++;
     }
     bufSendSPI.buf[bufSendSPI.posWrite] = command[inx];
     bufSendSPI.posWrite++;
-    if( bufSendSPI.posWrite >= BUF_LEN )
-    {
-	bufSendSPI.posWrite = (BUF_LEN - 1);
+    if (bufSendSPI.posWrite >= BUF_LEN) {
+        bufSendSPI.posWrite = (BUF_LEN - 1);
     }
 
     return;
 }
 
-bool spiResponseEnd( void )
-{
+bool spiResponseEnd(void) {
     bool responseEnd = false;
 
-    if( bufRecvSPI.buf[ bufRecvSPI.posWrite - 1 ] == '*' )
-    {
-//		if( LED3READ == 0 )
-//		{
-//		    LED3SET = 1;
-//		}
-//		else
-//		{
-//		    LED3SET = 1;
-//		}
+    if (bufRecvSPI.buf[ bufRecvSPI.posWrite - 1 ] == '*') {
+        //		if( LED3READ == 0 )
+        //		{
+        //		    LED3SET = 1;
+        //		}
+        //		else
+        //		{
+        //		    LED3SET = 1;
+        //		}
 
-	responseEnd = true;
+        responseEnd = true;
     }
 
     return responseEnd;
 }
 
-void spiComm( void )
-{
-    spiCommSend( );
-    spiCommRecv( );
+void spiComm(void) {
+    spiCommSend();
+    spiCommRecv();
 
     return;
 }
 
-void spiCommSend( void )
-{
-    if( bufSendSPI.posRead != bufSendSPI.posWrite )
-    {
-	//LED1SET = 1;
-	//	if( U2STAbits.UTXBF == 0 )
-	//	{
-	if( spiCommSendChar( bufSendSPI.buf[bufSendSPI.posRead] ) == true )
-	{
-	    bufSendSPI.posRead++;
-	    if( bufSendSPI.posRead >= BUF_LEN )
-	    {
-		bufSendSPI.posRead = 0;
-	    }
-	}
-	//	}
-    }
-    else
-    {
-//  Confirmed, does send
-    bufSendSPI.posRead = 0;
-	bufSendSPI.posWrite = 0;
+void spiCommSend(void) {
+    if (bufSendSPI.posRead != bufSendSPI.posWrite) {
+        //LED1SET = 1;
+        //	if( U2STAbits.UTXBF == 0 )
+        //	{
+        if (spiCommSendChar(bufSendSPI.buf[bufSendSPI.posRead]) == true) {
+            bufSendSPI.posRead++;
+            if (bufSendSPI.posRead >= BUF_LEN) {
+                bufSendSPI.posRead = 0;
+            }
+        }
+        //	}
+    } else {
+        //  Confirmed, does send
+        bufSendSPI.posRead = 0;
+        bufSendSPI.posWrite = 0;
     }
     return;
 }
@@ -1197,38 +1050,34 @@ void spiCommSend( void )
 //    return dataSent;
 //}
 
-bool spiCommSendChar( char data )
-{
+bool spiCommSendChar(char data) {
     bool sendGood = false;
 
 
-    if( SPI1STATbits.SPITBF == 0b0 ) //if in enhance mode use SPI1STATbits.SR1MPT
+    if (SPI1STATbits.SPITBF == 0b0) //if in enhance mode use SPI1STATbits.SR1MPT
     {
-	SPI1BUF = data;
-	sendGood = true;
-    __delay_ms(1);
-	U2TXREG = data;
+        SPI1BUF = data;
+        sendGood = true;
+        __delay_ms(1);
+        U2TXREG = data;
     }
 
     return sendGood;
 }
 
-bool spiCommRecv( void )
-{
+bool spiCommRecv(void) {
     bool dataReceived = false;
     char data;
-    if( spiCommRecvChar( &data ) == true )
-    {
-// This is where the magic spi happens Zach
+    if (spiCommRecvChar(&data) == true) {
+        // This is where the magic spi happens Zach
 
-	bufRecvSPI.buf[bufRecvSPI.posWrite] = data;
-	dataReceived = true;
-	bufRecvSPI.posWrite++;
-	if( bufRecvSPI.posWrite >= BUF_LEN )
-	{
-	    bufRecvSPI.posWrite = 0;
-	}
-	bufRecvSPI.buf[bufRecvSPI.posWrite] = CHAR_NULL;
+        bufRecvSPI.buf[bufRecvSPI.posWrite] = data;
+        dataReceived = true;
+        bufRecvSPI.posWrite++;
+        if (bufRecvSPI.posWrite >= BUF_LEN) {
+            bufRecvSPI.posWrite = 0;
+        }
+        bufRecvSPI.buf[bufRecvSPI.posWrite] = CHAR_NULL;
     }
     return dataReceived;
 }
@@ -1246,24 +1095,21 @@ bool spiCommRecv( void )
 //    return dataReceived;
 //}
 
-bool spiCommRecvChar( char *data )
-{
+bool spiCommRecvChar(char *data) {
     bool recvGood = false;
-    if( SPI1STATbits.SPIRBF == 0b1 )
-    {
-	*data = SPI1BUF;
-	recvGood = true;
-//	if( *data != '@' )
-//	{
-	    U2TXREG = *data;
-//	}
+    if (SPI1STATbits.SPIRBF == 0b1) {
+        *data = SPI1BUF;
+        recvGood = true;
+        //	if( *data != '@' )
+        //	{
+        U2TXREG = *data;
+        //	}
     }
 
     return recvGood;
 }
 
-void spiInit( void )
-{
+void spiInit(void) {
     // make sure analog is turned off - it messes with the pins
     ANSA = 0;
     ANSB = 0;
@@ -1273,7 +1119,7 @@ void spiInit( void )
     TRISBbits.TRISB6 = 0;
 
     TRISBbits.TRISB12 = 1;
-//    TRISAbits.TRISA7 = 1;
+    //    TRISAbits.TRISA7 = 1;
 
     //SPI1 Initialize as Slave
     SPI1CON1bits.MSTEN = 0;
@@ -1315,10 +1161,43 @@ int return_char_length(char* str) {
     static int i = 0;
     char chars = str[i];
     int accumulator = 0;
-    while( chars != '\0' ) {
+    while (chars != '\0') {
         i++;
         chars = str[i];
         accumulator++;
     }
     return accumulator;
+}
+
+char networkInfoPrepared(char networkInfo) {
+    remove_all_chars(networkInfo, '\n');
+    remove_all_chars(networkInfo, '\r');
+    remove_all_chars(networkInfo, '+');
+    remove_all_chars(networkInfo, '>');
+    remove_all_chars(networkInfo, '"');
+    char str[2] = "\n";
+    strcat(networkInfo, str);
+
+    return networkInfo;
+}
+
+char networkInfoSend(char networkInfo) {
+
+    char strPrefix[] = "CIPSEND=0,";
+    char toCharr[10];
+
+    int old_array_len = return_char_length(networkInfo);
+    sprintf(toCharr, "%d", old_array_len);
+    int new_array_len = 10 + return_char_length(toCharr);
+
+    char sendCommand[new_array_len];
+    for (int i = 0; i < new_array_len; i++) {
+        if (i < 10) {
+            sendCommand[i] = strPrefix[i];
+        }
+        if (i >= 10) {
+            sendCommand[i] = toCharr[i - 10];
+        }
+    }
+    return sendCommand;
 }

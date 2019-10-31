@@ -1,0 +1,24 @@
+{
+    "Header": {
+        "Comment": "All values are metric (mm)",
+        "CreationDate": "2019-03-13T20:31:59Z",
+        "GenerationSoftware": {
+            "Application": "EAGLE",
+            "Vendor": "Autodesk",
+            "Version": "9.2.2"
+        },
+        "Part": "Single"
+    },
+    "Overall": {
+        "BoardThickness": 1.57,
+        "LayerNumber": 2,
+        "Name": {
+            "ProjectId": "Wifi Schemati"
+        },
+        "Owner": "Zachery Holsinger <zh2172@messiah.edu>",
+        "Size": {
+            "X": 78.614013,
+            "Y": 45.811944
+        }
+    }
+}

@@ -114,24 +114,24 @@ xc16-ld 1.36 (A)
 section                    address   length (PC units)   length (bytes) (dec)
 -------                    -------   -----------------   --------------------
 .text                        0x200               0x8ec           0xd62  (3426)
-.const                       0xaec               0x202           0x303  (771)
-.text                        0xcee               0xffa          0x17f7  (6135)
-.dinit                      0x1ce8                0x7a            0xb7  (183)
-.init.delay32               0x1d62                0x1c            0x2a  (42)
+.const                       0xaec               0x21e           0x32d  (813)
+.text                        0xd0a              0x1074          0x18ae  (6318)
+.dinit                      0x1d7e                0x7a            0xb7  (183)
+.init.delay32               0x1df8                0x1c            0x2a  (42)
 
-                 Total "program" memory used (bytes):         0x293d  (10557) 31%
+                 Total "program" memory used (bytes):         0x2a1e  (10782) 32%
 
 
 "data" Memory  [Origin = 0x800, Length = 0x800]
 
 section                    address      alignment gaps    total length  (dec)
 -------                    -------      --------------    -------------------
-.nbss                        0x800                   0           0x598  (1432)
-.data                        0xd98                   0            0x78  (120)
-.bss                         0xe10                   0             0x6  (6)
-.data                        0xe16                   0             0x2  (2)
+.nbss                        0x800                   0           0x59a  (1434)
+.data                        0xd9a                   0            0x78  (120)
+.bss                         0xe12                   0             0x6  (6)
+.data                        0xe18                   0             0x2  (2)
 
-                 Total "data" memory used (bytes):          0x618  (1560) 76%
+                 Total "data" memory used (bytes):          0x61a  (1562) 76%
 
 
 Dynamic Memory Usage
@@ -139,9 +139,9 @@ Dynamic Memory Usage
 region                     address                      maximum length  (dec)
 ------                     -------                      ---------------------
 heap                             0                                   0  (0)
-stack                        0xe18                               0x1e8  (488)
+stack                        0xe1a                               0x1e6  (486)
 
-                 Maximum dynamic memory (bytes):          0x1e8  (488)
+                 Maximum dynamic memory (bytes):          0x1e6  (486)
 
 
 External Symbols in Data Memory (by address):
@@ -156,23 +156,24 @@ External Symbols in Data Memory (by address):
                     0x0c7c                  _ssidInfo
                     0x0cae                  _getBuffer
                     0x0cb0                  _counter
-                    0x0d90                  _timer_ms
-                    0x0d94                  _oldTimer
-                    0x0dea                  __iob
-                    0x0e0e                  __Files
-                    0x0e10                  __outdone
-                    0x0e11                  __sibuf
-                    0x0e13                  __sobuf
-                    0x0e16                  ___C30_UART
+                    0x0cb2                  _pulseMode
+                    0x0d92                  _timer_ms
+                    0x0d96                  _oldTimer
+                    0x0dec                  __iob
+                    0x0e10                  __Files
+                    0x0e12                  __outdone
+                    0x0e13                  __sibuf
+                    0x0e15                  __sobuf
+                    0x0e18                  ___C30_UART
 
 External Symbols in Data Memory (by name):
 
-                    0x0e0e                  __Files
-                    0x0e16                  ___C30_UART
-                    0x0dea                  __iob
-                    0x0e10                  __outdone
-                    0x0e11                  __sibuf
-                    0x0e13                  __sobuf
+                    0x0e10                  __Files
+                    0x0e18                  ___C30_UART
+                    0x0dec                  __iob
+                    0x0e12                  __outdone
+                    0x0e13                  __sibuf
+                    0x0e15                  __sobuf
                     0x0af4                  _bufRecvSPI
                     0x08fc                  _bufRecvWiFi
                     0x09f8                  _bufSendSPI
@@ -182,9 +183,10 @@ External Symbols in Data Memory (by name):
                     0x0c54                  _ipAddr
                     0x0c68                  _macAddr
                     0x0bf0                  _networkInfo
-                    0x0d94                  _oldTimer
+                    0x0d96                  _oldTimer
+                    0x0cb2                  _pulseMode
                     0x0c7c                  _ssidInfo
-                    0x0d90                  _timer_ms
+                    0x0d92                  _timer_ms
 
 External Symbols in Program Memory (by address):
 
@@ -203,37 +205,38 @@ External Symbols in Program Memory (by address):
                   0x00042e                  __sprintf_cdnopuxX
                   0x00046c                  __vfprintf_cdnopuxX
                   0x000ac0                  ___udivsi3
+                  0x000ae0                  ___mulsi3
                   0x000ae0                  ___mulp32eds3
                   0x000ae0                  ___mulp32peds3
-                  0x000ae0                  ___mulsi3
-                  0x000cee                  _wifiInit
-                  0x000d82                  _wifi
-                  0x001298                  _wifiServer
-                  0x001376                  _wifiCommandAdd
-                  0x0014b0                  _wifiCommandSet
-                  0x00156a                  _wifiResponseCheck
-                  0x0016c4                  _wifiResponseEnd
-                  0x0016fa                  _wifiComm
-                  0x001704                  _wifiCommSend
-                  0x001742                  _wifiCommSendChar
-                  0x0017ee                  _wifiCommRecv
-                  0x00182c                  _wifiCommRecvChar
-                  0x001888                  _spi
-                  0x001972                  _spiServer
-                  0x00198c                  _spiCommandSet
-                  0x0019ee                  _spiResponseEnd
-                  0x001a10                  _spiComm
-                  0x001a1a                  _spiCommSend
-                  0x001a4e                  _spiCommSendChar
-                  0x001a7a                  _spiCommRecv
-                  0x001ab8                  _spiCommRecvChar
-                  0x001ae2                  _spiInit
-                  0x001b1e                  _remove_all_chars
-                  0x001b5e                  _return_char_length
-                  0x001b90                  _main
-                  0x001cb0                  _init
-                  0x001cc0                  _initTimer
-                  0x001d62                  ___delay32
+                  0x000d0a                  _wifiInit
+                  0x000d9e                  _wifi
+                  0x001272                  _wifiServer
+                  0x001350                  _wifiCommandAdd
+                  0x00148a                  _wifiCommandSet
+                  0x001544                  _wifiResponseCheck
+                  0x00169e                  _wifiResponseEnd
+                  0x0016d4                  _wifiComm
+                  0x0016de                  _wifiCommSend
+                  0x00171c                  _wifiCommSendChar
+                  0x0017c8                  _wifiCommRecv
+                  0x001806                  _wifiCommRecvChar
+                  0x001862                  _spi
+                  0x00194c                  _spiServer
+                  0x001966                  _spiCommandSet
+                  0x0019c8                  _spiResponseEnd
+                  0x0019ea                  _spiComm
+                  0x0019f4                  _spiCommSend
+                  0x001a28                  _spiCommSendChar
+                  0x001a54                  _spiCommRecv
+                  0x001a92                  _spiCommRecvChar
+                  0x001abc                  _spiInit
+                  0x001af8                  _remove_all_chars
+                  0x001b38                  _return_char_length
+                  0x001b6e                  _send_Wifi_Length
+                  0x001c26                  _main
+                  0x001d46                  _init
+                  0x001d56                  _initTimer
+                  0x001df8                  ___delay32
                   0xf80000                  __FBS.sec
                   0xf80004                  __FGS.sec
 
@@ -242,7 +245,7 @@ External Symbols in Program Memory (by name):
                   0x0002c8                  __DefaultInterrupt
                   0xf80000                  __FBS.sec
                   0xf80004                  __FGS.sec
-                  0x001d62                  ___delay32
+                  0x001df8                  ___delay32
                   0x000ae0                  ___mulp32eds3
                   0x000ae0                  ___mulp32peds3
                   0x000ae0                  ___mulsi3
@@ -254,39 +257,40 @@ External Symbols in Program Memory (by name):
                   0x00042e                  __sprintf_cdnopuxX
                   0x00046c                  __vfprintf_cdnopuxX
                   0x000352                  _atoi
-                  0x001cb0                  _init
-                  0x001cc0                  _initTimer
+                  0x001d46                  _init
+                  0x001d56                  _initTimer
                   0x0003c4                  _itoa
-                  0x001b90                  _main
+                  0x001c26                  _main
                   0x0003e0                  _memset
-                  0x001b1e                  _remove_all_chars
-                  0x001b5e                  _return_char_length
-                  0x001888                  _spi
-                  0x001a10                  _spiComm
-                  0x001a7a                  _spiCommRecv
-                  0x001ab8                  _spiCommRecvChar
-                  0x001a1a                  _spiCommSend
-                  0x001a4e                  _spiCommSendChar
-                  0x00198c                  _spiCommandSet
-                  0x001ae2                  _spiInit
-                  0x0019ee                  _spiResponseEnd
-                  0x001972                  _spiServer
+                  0x001af8                  _remove_all_chars
+                  0x001b38                  _return_char_length
+                  0x001b6e                  _send_Wifi_Length
+                  0x001862                  _spi
+                  0x0019ea                  _spiComm
+                  0x001a54                  _spiCommRecv
+                  0x001a92                  _spiCommRecvChar
+                  0x0019f4                  _spiCommSend
+                  0x001a28                  _spiCommSendChar
+                  0x001966                  _spiCommandSet
+                  0x001abc                  _spiInit
+                  0x0019c8                  _spiResponseEnd
+                  0x00194c                  _spiServer
                   0x0003ee                  _strcat
                   0x000402                  _strcmp
                   0x000410                  _strncmp
                   0x000390                  _utoa
-                  0x000d82                  _wifi
-                  0x0016fa                  _wifiComm
-                  0x0017ee                  _wifiCommRecv
-                  0x00182c                  _wifiCommRecvChar
-                  0x001704                  _wifiCommSend
-                  0x001742                  _wifiCommSendChar
-                  0x001376                  _wifiCommandAdd
-                  0x0014b0                  _wifiCommandSet
-                  0x000cee                  _wifiInit
-                  0x00156a                  _wifiResponseCheck
-                  0x0016c4                  _wifiResponseEnd
-                  0x001298                  _wifiServer
+                  0x000d9e                  _wifi
+                  0x0016d4                  _wifiComm
+                  0x0017c8                  _wifiCommRecv
+                  0x001806                  _wifiCommRecvChar
+                  0x0016de                  _wifiCommSend
+                  0x00171c                  _wifiCommSendChar
+                  0x001350                  _wifiCommandAdd
+                  0x00148a                  _wifiCommandSet
+                  0x000d0a                  _wifiInit
+                  0x001544                  _wifiResponseCheck
+                  0x00169e                  _wifiResponseEnd
+                  0x001272                  _wifiServer
 
 Memory Configuration
 
@@ -399,12 +403,12 @@ usercode
 
 __FBS             0xf80000          0x2
  *(__FBS.sec*)
- __FBS.sec        0xf80000          0x2 /CW/_FBSHté
+ __FBS.sec        0xf80000          0x2 /CW/_FBSèÓÝ
                   0xf80000                  __FBS.sec
 
 __FGS             0xf80004          0x2
  *(__FGS.sec*)
- __FGS.sec        0xf80004          0x2 /CW/_FGSX”é
+ __FGS.sec        0xf80004          0x2 /CW/_FGSÐ£Ý
                   0xf80004                  __FGS.sec
 
 __FOSCSEL
@@ -428,10 +432,10 @@ __FDS
 .comment
  *(.comment)
 
-.debug_info       0x000000       0x2cc2
+.debug_info       0x000000       0x2d2c
  *(.debug_info)
  .debug_info      0x000000        0xc43 build/default/production/WiFi_main.o
- .debug_info      0x000c43       0x207f build/default/production/WiFi.o
+ .debug_info      0x000c43       0x20e9 build/default/production/WiFi.o
  *(.gnu.linkonce.wi.*)
 
 .debug_abbrev     0x000000        0x392
@@ -439,20 +443,20 @@ __FDS
  .debug_abbrev    0x000000        0x161 build/default/production/WiFi_main.o
  .debug_abbrev    0x000161        0x231 build/default/production/WiFi.o
 
-.debug_line       0x000000        0x516
+.debug_line       0x000000        0x538
  *(.debug_line)
  .debug_line      0x000000        0x143 build/default/production/WiFi_main.o
- .debug_line      0x000143        0x3d3 build/default/production/WiFi.o
+ .debug_line      0x000143        0x3f5 build/default/production/WiFi.o
 
-.debug_frame      0x000000        0x330
+.debug_frame      0x000000        0x34c
  *(.debug_frame)
  .debug_frame     0x000000         0x68 build/default/production/WiFi_main.o
- .debug_frame     0x000068        0x2c8 build/default/production/WiFi.o
+ .debug_frame     0x000068        0x2e4 build/default/production/WiFi.o
 
-.debug_str        0x000000        0x178
+.debug_str        0x000000        0x18a
  *(.debug_str)
  .debug_str       0x000000         0x56 build/default/production/WiFi_main.o
- .debug_str       0x000056        0x122 build/default/production/WiFi.o
+ .debug_str       0x000056        0x134 build/default/production/WiFi.o
 
 .debug_loc
  *(.debug_loc)
@@ -461,12 +465,12 @@ __FDS
  *(.debug_macinfo)
 
 .debug_pubnames
-                  0x000000        0x27f
+                  0x000000        0x2a2
  *(.debug_pubnames)
  .debug_pubnames
                   0x000000         0x4c build/default/production/WiFi_main.o
  .debug_pubnames
-                  0x00004c        0x233 build/default/production/WiFi.o
+                  0x00004c        0x256 build/default/production/WiFi.o
 
 .debug_ranges
  *(.debug_ranges)
@@ -1092,8 +1096,8 @@ LOAD c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libm-elf.a
 LOAD c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libc-elf.a
 END GROUP
 OUTPUT(dist/default/production/Tes_WIFI_Archive.production.elf elf32-pic30)
-LOAD /CW/_FGSX”é
-LOAD /CW/_FBSHté
+LOAD /CW/_FGSÐ£Ý
+LOAD /CW/_FBSèÓÝ
 LOAD default_isr
 LOAD data_init
 
@@ -1147,8 +1151,8 @@ __c30_signature
  __c30_signature
                   0x000384          0x6 c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libm-elf.a(mulsi3.eo)
 
-.nbss               0x0800        0x598
- .nbss              0x0800        0x590 build/default/production/WiFi.o
+.nbss               0x0800        0x59a
+ .nbss              0x0800        0x592 build/default/production/WiFi.o
                     0x0800                  _bufSendWiFi
                     0x08fc                  _bufRecvWiFi
                     0x09f8                  _bufSendSPI
@@ -1159,25 +1163,26 @@ __c30_signature
                     0x0c7c                  _ssidInfo
                     0x0cae                  _getBuffer
                     0x0cb0                  _counter
- .nbss              0x0d90          0x8 build/default/production/WiFi_main.o
-                    0x0d90                  _timer_ms
-                    0x0d94                  _oldTimer
+                    0x0cb2                  _pulseMode
+ .nbss              0x0d92          0x8 build/default/production/WiFi_main.o
+                    0x0d92                  _timer_ms
+                    0x0d96                  _oldTimer
 
-.data               0x0d98         0x78
- .data              0x0d98         0x52 c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libc-elf.a(doprnt_cdnopuxX.XXeo)
- .data              0x0dea         0x26 c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libc-elf.a(_iob.eo)
-                    0x0dea                  __iob
-                    0x0e0e                  __Files
+.data               0x0d9a         0x78
+ .data              0x0d9a         0x52 c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libc-elf.a(doprnt_cdnopuxX.XXeo)
+ .data              0x0dec         0x26 c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libc-elf.a(_iob.eo)
+                    0x0dec                  __iob
+                    0x0e10                  __Files
 
-.bss                0x0e10          0x6
- .bss               0x0e10          0x6 c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libc-elf.a(_iob.eo)
-                    0x0e10                  __outdone
-                    0x0e11                  __sibuf
-                    0x0e13                  __sobuf
+.bss                0x0e12          0x6
+ .bss               0x0e12          0x6 c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libc-elf.a(_iob.eo)
+                    0x0e12                  __outdone
+                    0x0e13                  __sibuf
+                    0x0e15                  __sobuf
 
-.data               0x0e16          0x2
- .data              0x0e16          0x2 c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libpic30-elf.a(c30_uart.eo)
-                    0x0e16                  ___C30_UART
+.data               0x0e18          0x2
+ .data              0x0e18          0x2 c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libpic30-elf.a(c30_uart.eo)
+                    0x0e18                  ___C30_UART
 
 .config_DSWDTEN
                   0xf80010          0x2
@@ -1200,43 +1205,44 @@ __c30_signature
 .config_IESO      0xf80006          0x2
  .config_IESO     0xf80006          0x2 build/default/production/WiFi_main.o
 
-.const              0x8aec        0x202 load address 0x000aec  
- .const             0x8aec        0x202 build/default/production/WiFi.o
+.const              0x8aec        0x21e load address 0x000aec  
+ .const             0x8aec        0x21e build/default/production/WiFi.o
 
-.text             0x000cee        0xffa
- .text            0x000cee        0xea2 build/default/production/WiFi.o
-                  0x000cee                  _wifiInit
-                  0x000d82                  _wifi
-                  0x001298                  _wifiServer
-                  0x001376                  _wifiCommandAdd
-                  0x0014b0                  _wifiCommandSet
-                  0x00156a                  _wifiResponseCheck
-                  0x0016c4                  _wifiResponseEnd
-                  0x0016fa                  _wifiComm
-                  0x001704                  _wifiCommSend
-                  0x001742                  _wifiCommSendChar
-                  0x0017ee                  _wifiCommRecv
-                  0x00182c                  _wifiCommRecvChar
-                  0x001888                  _spi
-                  0x001972                  _spiServer
-                  0x00198c                  _spiCommandSet
-                  0x0019ee                  _spiResponseEnd
-                  0x001a10                  _spiComm
-                  0x001a1a                  _spiCommSend
-                  0x001a4e                  _spiCommSendChar
-                  0x001a7a                  _spiCommRecv
-                  0x001ab8                  _spiCommRecvChar
-                  0x001ae2                  _spiInit
-                  0x001b1e                  _remove_all_chars
-                  0x001b5e                  _return_char_length
- .text            0x001b90        0x158 build/default/production/WiFi_main.o
-                  0x001b90                  _main
-                  0x001cb0                  _init
-                  0x001cc0                  _initTimer
+.text             0x000d0a       0x1074
+ .text            0x000d0a        0xf1c build/default/production/WiFi.o
+                  0x000d0a                  _wifiInit
+                  0x000d9e                  _wifi
+                  0x001272                  _wifiServer
+                  0x001350                  _wifiCommandAdd
+                  0x00148a                  _wifiCommandSet
+                  0x001544                  _wifiResponseCheck
+                  0x00169e                  _wifiResponseEnd
+                  0x0016d4                  _wifiComm
+                  0x0016de                  _wifiCommSend
+                  0x00171c                  _wifiCommSendChar
+                  0x0017c8                  _wifiCommRecv
+                  0x001806                  _wifiCommRecvChar
+                  0x001862                  _spi
+                  0x00194c                  _spiServer
+                  0x001966                  _spiCommandSet
+                  0x0019c8                  _spiResponseEnd
+                  0x0019ea                  _spiComm
+                  0x0019f4                  _spiCommSend
+                  0x001a28                  _spiCommSendChar
+                  0x001a54                  _spiCommRecv
+                  0x001a92                  _spiCommRecvChar
+                  0x001abc                  _spiInit
+                  0x001af8                  _remove_all_chars
+                  0x001b38                  _return_char_length
+                  0x001b6e                  _send_Wifi_Length
+ .text            0x001c26        0x158 build/default/production/WiFi_main.o
+                  0x001c26                  _main
+                  0x001d46                  _init
+                  0x001d56                  _initTimer
 
-.dinit            0x001ce8         0x7a
- .dinit           0x001ce8         0x7a data_init
+.dinit            0x001d7e         0x7a
+ .dinit           0x001d7e         0x7a data_init
 
-.init.delay32     0x001d62         0x1c
- .init.delay32    0x001d62         0x1c c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libpic30-elf.a(delay32.eo)
-                  0x001d62                  ___delay32
+.init.delay32     0x001df8         0x1c
+ .init.delay32    0x001df8         0x1c c:/program files (x86)/microchip/xc16/v1.36/bin/bin/../../lib\libpic30-elf.a(delay32.eo)
+                  0x001df8                  ___delay32

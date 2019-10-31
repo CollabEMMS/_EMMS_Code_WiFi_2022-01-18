@@ -1,0 +1,13 @@
+[Energy And Monitoring Management Systems] [EMMS] 
+
+WIFI CHANGELOG:
+
+==[10/31/2019]==
+ MAJOR UPDATE 1
+================
+African Update:
+- Added Debug Mode
+- Confirmed working in Zimbabwe TCZ with 6/07/2019 Version CB
+- Added Wifi Versioning
+- Added UART to SPI passthrough for complete functionality
+- Wifi Connection Error control

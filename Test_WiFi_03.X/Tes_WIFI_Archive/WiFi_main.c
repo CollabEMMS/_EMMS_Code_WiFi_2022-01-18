@@ -99,6 +99,7 @@
 
 #include "WiFi.h"
 
+#define CHAR_NULL '\0'
 
 unsigned long timer_ms = 0;
 unsigned long oldTimer = 0;
@@ -106,7 +107,8 @@ unsigned long oldTimer = 0;
 void init( void );
 void initTimer( void );
 void initUART1( void );
-void spi(bool init);
+void spi( bool init );
+void UART2SendString( char *message );
 
 /*
  *
@@ -115,9 +117,9 @@ int main( int argc, char** argv )
 {
     ANSBbits.ANSB14 = 0;
     ANSBbits.ANSB15 = 0;
-    
-    
-// INITIAL START UP LED SEQUENCE
+
+
+    // INITIAL START UP LED SEQUENCE
     LED1DIR = 0;
     LED2DIR = 0;
     LED3DIR = 0;
@@ -127,84 +129,67 @@ int main( int argc, char** argv )
     LED2SET = 1;
     __delay_ms( 500 );
     LED3SET = 1;
-    __delay_ms ( 500 );
+    __delay_ms( 500 );
 
     for( int inx = 0; inx < 5; inx++ )
     {
 	if( LED1READ == 0 )
 	{
 	    LED1SET = 1;
-        LED2SET = 1;
-        LED3SET = 1;
+	    LED2SET = 1;
+	    LED3SET = 1;
 	}
 	else
 	{
 	    LED1SET = 0;
-        LED2SET = 0;
-        LED3SET = 0;
+	    LED2SET = 0;
+	    LED3SET = 0;
 	}
 	__delay_ms( 100 );
     }
     LED1SET = 0;
     LED2SET = 0;
     LED3SET = 0;
-    
-//    END INITIAL LED SEQUENCE
-    
-    
-//    BEGIN INITIALIZATION    
+
+    //    END INITIAL LED SEQUENCE
+
+
+    //    BEGIN INITIALIZATION
     init( );
 
-//    FLASHES FAST TO LET USER KNOW ITS INITIALIZED
-//    This should be to Show UART is ready to connect!
-    
-    for( int inx = 0; inx < 30; inx++ )
+    //    FLASHES FAST TO LET USER KNOW ITS INITIALIZED
+    //    This should be to Show UART is ready to connect!
+    if( debugMode == 1 )
     {
-	if( LED3READ == 0 )
+	for( int inx = 0; inx < 30; inx++ )
 	{
-	    LED3SET = 1;
+	    if( LED3READ == 0 )
+	    {
+		LED3SET = 1;
+	    }
+	    else
+	    {
+		LED3SET = 0;
+	    }
+	    __delay_ms( 30 );
 	}
-	else
-	{
-	    LED3SET = 0;
-	}
-	__delay_ms( 30 );
     }
-    
-    
-    
-    
+
     wifi( true );
-    spi(true); 
+    spi( true );
 
     __delay_ms( 1000 );
 
     //    unsigned long oldTimer = 0;
-
-    U2TXREG = '\r';
-    __delay_ms( 50 );
-    U2TXREG = '\n';
-    __delay_ms( 50 );
-    U2TXREG = 's';
-    __delay_ms( 50 );
-    U2TXREG = 't';
-    __delay_ms( 50 );
-    U2TXREG = 'a';
-    __delay_ms( 50 );
-    U2TXREG = 'r';
-    __delay_ms( 50 );
-    U2TXREG = 't';
-    __delay_ms( 50 );
-    U2TXREG = '\r';
-    __delay_ms( 50 );
-    U2TXREG = '\n';
-    __delay_ms( 50 );
-
+    UART2SendString( "Start :)" );
 
     while( 1 )
     {
 #define TIMER_MS_COUNT 1000
+
 	wifi( false );
+	spi( false );
+
 	if( TMR1 > TIMER_MS_COUNT )
 	{
 	    if( timer_ms == ULONG_MAX )
@@ -216,29 +201,9 @@ int main( int argc, char** argv )
 		timer_ms++;
 	    }
 	    TMR1 = 0x0000;
-        
-          
+
 	}
-    
-
-
-	//	if( timer_ms > (oldTimer + 1000) )
-	//	{
-	//	    oldTimer = timer_ms;
-	//	    if( LED2READ == 0 )
-	//	    {
-	//		LED2SET = 1;
-	//		U2TXREG = 't';
-	//	    }
-	//	    else
-	//	    {
-	//		LED2SET = 0;
-	//	    }
-	//	}
     }
-    
-    
-  
 
     return (EXIT_SUCCESS);
 }
@@ -249,7 +214,6 @@ void init( void )
     ANSBbits.ANSB15 = 0;
 
     TRISBbits.TRISB14 = 0;
-    TRISBbits.TRISB15 = 0;
 
     initTimer( );
 
@@ -274,5 +238,29 @@ void initTimer( void )
     timer_ms = 0;
 
     T1CONbits.TON = 0b1; //turn on timer
+
+}
+
+void UART2SendString( char *message )
+{
+
+    int inx = 0;
+
+    U2TXREG = '\r';
+    __delay_ms( 10 );
+    U2TXREG = '\n';
+    __delay_ms( 10 );
+
+    while( message[inx] != CHAR_NULL )
+    {
+	U2TXREG = message[inx];
+	__delay_ms( 10 );
+	inx++;
+    }
+
+    U2TXREG = '\r';
+    __delay_ms( 10 );
+    U2TXREG = '\n';
+    __delay_ms( 10 );
 
 }

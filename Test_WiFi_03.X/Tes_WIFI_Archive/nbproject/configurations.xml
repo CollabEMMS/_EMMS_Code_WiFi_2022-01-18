@@ -19,6 +19,7 @@
       <itemPath>WiFi_main.c</itemPath>
       <itemPath>WiFi.c</itemPath>
       <itemPath>_notes.txt</itemPath>
+      <itemPath>CHANGELOG.txt</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

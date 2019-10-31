@@ -6,6 +6,7 @@
 
 #include <p24FV32KA302.h>
 extern void wifi( bool init);
+extern int debugMode;
 
 
 // Comment a function and leverage automatic documentation with slash star star

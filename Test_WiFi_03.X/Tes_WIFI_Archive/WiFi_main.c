@@ -118,7 +118,7 @@ int main( int argc, char** argv )
     ANSBbits.ANSB14 = 0;
     ANSBbits.ANSB15 = 0;
 
-
+   
     // INITIAL START UP LED SEQUENCE
     LED1DIR = 0;
     LED2DIR = 0;

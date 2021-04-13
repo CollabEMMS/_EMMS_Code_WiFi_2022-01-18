@@ -36,7 +36,7 @@ struct struct_buf bufSendSPIHolding;
 
 void UART2SendString( char *message );
 extern unsigned long timer_ms;
-
+// Wifi-related variables
 void wifi( bool init );
 void wifiComm( void );
 void wifiCommandSet( char *command, bool addPrefix );
@@ -48,6 +48,7 @@ bool wifiCommSendChar( char data );
 bool wifiCommRecv( void );
 bool wifiCommRecvChar( char *data );
 void wifiInit( void );
+// END Wifi-related variables.
 
 bool spiCommRecvChar( char *data );
 bool spiCommRecv( void );
@@ -62,7 +63,6 @@ void spi( bool init );
 void spiInit( void );
 void remove_all_chars( char* str, char c );
 int return_char_length( char* str );
-// Wifi-related variables
 
 char networkInfo[100] = "";
 //char ipAddr[20] = "";
@@ -70,13 +70,15 @@ char networkInfo[100] = "";
 //char ssidInfo[50] = "";
 bool getBuffer = false;
 int counter = 0;
-int debugMode = 1;
+int debugMode = 1; // 1 = off, 0 = on
 char wifiInfo[100] = "";
 char spiResponse[50] = "";
 //bool spiSendYes = false;
 int sendingCommand = 0;
 
-
+/**
+ * Sets bits to communicate with ESP8266
+ */
 void wifiInit( )
 {
     ANSBbits.ANSB0 = 0;
@@ -143,6 +145,11 @@ void wifiInit( )
     return;
 }
 
+
+/**
+ * Turning on wifi-related features of code.
+ * @param init 
+ */
 void wifi( bool init )
 {
     // here we handle all things wifi
@@ -158,17 +165,22 @@ void wifi( bool init )
 	wifiInit( );
     }
     wifiComm( );
-
+    
     //    volatile int currentCommand;// used to make sure specific data is sent in tcp response
     //    volatile int currentWiFiNetwork; // Used to quickly save the network that works, to prevent dropping off of wifi and long startup times
 
+    
+    /**
+     * This switch stage controls the esp8266 boot sequence and how to connect
+     * to a network
+     * @param init
+     */
     switch( stage )
     {
     case 0:
     {
 
 	// reset and init
-	// set command
 	wifiCommandSet( "RST", true );
 	stage++;
 	break;
@@ -182,6 +194,7 @@ void wifi( bool init )
 
 	break;
     case 2:
+    // Gives it power-draw amount (must be set on boot per documentation)
 	wifiCommandSet( "RFPOWER=82", true );
 	stage++;
 	break;
@@ -362,25 +375,6 @@ void wifi( bool init )
 	break;
     case 18:
 
-	//	    spiCommandSet( "\r\nConnected!*" );
-	//	    for( int inx = 0; inx < 40; inx++ )
-	//	    {
-	//		if( LED1READ == 0 )
-	//		{
-	//		    LED1SET = 1;
-	//		    LED2SET = 1;
-	//		}
-	//		else
-	//		{
-	//		    LED1SET = 0;
-	//		    LED2SET = 0;
-	//		}
-	//		__delay_ms( 10 );
-	//		runone = true;
-	//	    }
-	//	    LED1SET = 0;
-	//	    LED2SET = 0;
-
 	//    FLASHES FAST TO LET USER KNOW ITS INITIALIZED
 	//    This should be to Show WIFI is ready to connect!
 	if( debugMode == 1 )
@@ -418,13 +412,14 @@ void wifi( bool init )
 	{
 	    if( currentCommand == 1 )
 	    {
-		wifiCommandSet( "MESSIAH COLLEGE COLLABORATORY\n\r", false );
+            // sends this as a default response to 'ok'
+		wifiCommandSet( "MESSIAH COLLEGE COLLABORATORY\r\n", false );
 		currentCommand = 0;
 	    }
 	}
 
 	// prints network info from cifsr
-	if( wifiResponseCheck( "+IPD,0,14:!MOD;NETWORK*", "null" ) == true )
+	if( wifiResponseCheck( "+IPD,0,14:!MOD;NETWORK*", "null" ) == true || wifiResponseCheck( "+IPD,0,15:!MOD;NETWORK*", "null" ) == true )
 	{
 	    // have it send variable of IP Shtuff from cifsr
 	    remove_all_chars( networkInfo, '\n' );
@@ -470,8 +465,11 @@ void wifi( bool init )
 		currentCommand = 0;
 	    }
 	}
-	//"+IPD,0,13:!MOD;CONFIG*"
-	if( wifiResponseCheck( "+IPD,0,13:!MOD;CONFIG*", "null" ) == true )
+
+        // This section of code processes specifc wifi-board related incoming 
+        // commands. if an incoming command is not recognized, it is then 
+        // forwarded on to the command board via SPI.
+	if( wifiResponseCheck( "+IPD,0,14:!MOD;CONFIG*", "null" ) == true  || wifiResponseCheck( "+IPD,0,13:!MOD;CONFIG*", "null" ) == true )
 	{
 	    // have it send variable of IP Shtuff from cifsr
 	    // set to 78
@@ -488,8 +486,8 @@ void wifi( bool init )
 		debugStat[0] = 'O';
 		debugStat[1] = 'N';
 	    }
-
-	    strcat( wifiInfo, "EMMS Collaboratory Team;Spring 2019;WiFi V1.5;Additional Installation;1;Unknown;" );
+        //                "<This doesnt change>   ;<Install Year>; <Version>; <Client>           ;<ID>;<Location>; <then it adds debug mode in at the end>
+	    strcat( wifiInfo, "EMMS Collaboratory Team;Spring 2021;WiFi V1.5;Additional Installation;1;Unknown;" );
 	    strcat( wifiInfo, debugStat );
 	    strcat( wifiInfo, ";\n" );
 	    int wifiInfoLen = strlen( wifiInfo );
@@ -542,7 +540,7 @@ void wifi( bool init )
 	    }
 
 	}
-	if( wifiResponseCheck( "+IPD,0,17:!Set;Lights;Off*", "null" ) == true )
+	if( wifiResponseCheck( "+IPD,0,17:!Set;Lights;Off*", "null" ) == true || wifiResponseCheck( "+IPD,0,18:!Set;Lights;Off*", "null" ) == true )
 	{
 	    debugMode = 0;
 	    LED1SET = 0;
@@ -552,7 +550,7 @@ void wifi( bool init )
 	}
 
 
-	if( wifiResponseCheck( "+IPD,0,16:!Set;Lights;On*", "null" ) == true )
+	if( wifiResponseCheck( "+IPD,0,16:!Set;Lights;On*", "null" ) == true || wifiResponseCheck( "+IPD,0,17:!Set;Lights;On*", "null" ) == true )
 	{
 	    debugMode = 1;
 	    LED1SET = 1;
@@ -865,6 +863,12 @@ void wifiCommandSet( char *command, bool addPrefix )
 
 }
 
+/**
+ * Parses incoming wifi commands and maybe will forward them on to the CB
+ * @param response
+ * @param varOutput
+ * @return 
+ */
 bool wifiResponseCheck( char* response, char* varOutput )
 {
     bool match = false;
@@ -928,6 +932,11 @@ bool wifiResponseCheck( char* response, char* varOutput )
     return match;
 }
 
+
+/**
+ * Looks for end of message delimeter and terminates message connection 
+ * @return 
+ */
 bool wifiResponseEnd( void )
 {
     bool responseEnd = false;
@@ -948,7 +957,10 @@ bool wifiResponseEnd( void )
 
     return responseEnd;
 }
-
+/**
+ * Setting up input/output to send/get messages for the esp8266
+ * This is essentially setup for how the pic controls the esp8266
+ */
 void wifiComm( )
 {
     wifiCommSend( );
@@ -956,7 +968,9 @@ void wifiComm( )
 
     return;
 }
-
+/**
+ * Sending a bit from the circular buffer to the esp8266 via UART
+ */
 void wifiCommSend( void )
 {
     if( bufSendWiFi.posRead != bufSendWiFi.posWrite )
@@ -1050,6 +1064,11 @@ bool wifiCommSendChar( char data )
     return dataSent;
 }
 
+/**
+ * Checking to see if data is there to receive, and getting that data 
+ * and returning it
+ * @return 
+ */
 bool wifiCommRecv( void )
 {
     bool dataReceived = false;
@@ -1070,6 +1089,13 @@ bool wifiCommRecv( void )
     return dataReceived;
 }
 
+
+/**
+ * Grabbing not the whole message but a single char 
+ * and returning that single char back
+ * @param data
+ * @return 
+ */
 bool wifiCommRecvChar( char *data )
 {
     bool dataReceived = false;
@@ -1104,6 +1130,10 @@ bool wifiCommRecvChar( char *data )
     return dataReceived;
 }
 
+/**
+ * Turns on spi features (including initialization)
+ * @param init
+ */
 void spi( bool init )
 {
     if( init == true )
@@ -1454,6 +1484,9 @@ bool spiCommRecvChar( char *data )
     return recvGood;
 }
 
+/**
+ * Self explanatory, gets SPI initialized to be used on the system
+ */
 void spiInit( void )
 {
     // make sure analog is turned off - it messes with the pins
@@ -1500,6 +1533,11 @@ void spiInit( void )
     return;
 }
 
+/**
+ * Supplement to stdlib 
+ * @param str
+ * @param c
+ */
 void remove_all_chars( char* str, char c )
 {
     char *pr = str, *pw = str;

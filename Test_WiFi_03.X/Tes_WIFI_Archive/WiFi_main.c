@@ -1,10 +1,11 @@
 /*
  * File:   WiFi_Test_main.c
  * Author: Austin
+ * Second, Equally as Cool Author: Zachery Holsinger
  *
  * Created on July 11, 2017, 9:42 PM
  */
-
+////////////////////////////////Configuration For MicroController///////////////
 /* Configuration Bits *********************************************************/
 // FBS
 #pragma config BWRP = OFF         // Boot Segment Write Protect (Disabled)
@@ -85,8 +86,10 @@
 // Sleep BOR enabled in Deep Sleep)
 #pragma config DSWDTEN = ON       // Deep Sleep Watchdog Timer Enable bit (DSWDT
 // enabled)
+////////////////////////////////END Configuration For MicroController///////////////
 
 
+//// Include statements /////
 #include <p24FV32KA302.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -98,8 +101,9 @@
 #include <libpic30.h>
 
 #include "WiFi.h"
-
+//// END Include statements /////
 #define CHAR_NULL '\0'
+#define TIMER_MS_COUNT 1000
 
 unsigned long timer_ms = 0;
 unsigned long oldTimer = 0;
@@ -111,7 +115,7 @@ void spi( bool init );
 void UART2SendString( char *message );
 
 /*
- *
+ * This is where everything begins. The inception
  */
 int main( int argc, char** argv )
 {
@@ -185,7 +189,6 @@ int main( int argc, char** argv )
 
     while( 1 )
     {
-#define TIMER_MS_COUNT 1000
 
 	wifi( false );
 	spi( false );
@@ -208,6 +211,10 @@ int main( int argc, char** argv )
     return (EXIT_SUCCESS);
 }
 
+
+/**
+ * Timer interrupts and timer init
+ */
 void init( void )
 {
     ANSBbits.ANSB14 = 0;
@@ -222,6 +229,9 @@ void init( void )
 
 }
 
+/**
+ * Initializes timer for PIC
+ */
 void initTimer( void )
 {
     // set timer up here
@@ -241,6 +251,10 @@ void initTimer( void )
 
 }
 
+/**
+ * Sends string through uart
+ * @param message
+ */
 void UART2SendString( char *message )
 {
 

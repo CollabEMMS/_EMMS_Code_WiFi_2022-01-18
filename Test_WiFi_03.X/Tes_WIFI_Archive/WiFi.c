@@ -239,10 +239,10 @@ void wifi( bool init )
 	break;
     case 8:
     {
-//	wifiCommandSet( "CWJAP_CUR=\"EMMS-Zim2019\",\"emms-mahadaga\"", true );
+            // Tries this WIFI First, when timeout occurs it tries other networks listed below
+	    				    //<SSID>          <password>
 	        wifiCommandSet( "CWJAP_CUR=\"EMMS-Meters\",\"emms_meters\"", true );
-
-	//        wifiCommandSet( "CWJAP_CUR=\"AW2\",\"*****\"", true ); // Not sure what this does
+	    //	wifiCommandSet( "CWJAP_CUR=\"EMMS-Zim2019\",\"emms-mahadaga\"", true );
 	stage++;
 	break;
     }

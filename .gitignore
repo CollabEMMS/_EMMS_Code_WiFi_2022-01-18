@@ -1,0 +1,17 @@
+
+*.o
+Test_WiFi_03.X/Tes_WIFI_Archive/build/default/production/WiFi.o
+Test_WiFi_03.X/Tes_WIFI_Archive/build/default/production/WiFi_main.o
+Test_WiFi_03.X/Tes_WIFI_Archive/dist/default/production/memoryfile.xml
+Test_WiFi_03.X/Tes_WIFI_Archive/dist/default/production/Tes_WIFI_Archive.production.elf
+Test_WiFi_03.X/Tes_WIFI_Archive/dist/default/production/Tes_WIFI_Archive.production.hex
+Test_WiFi_03.X/Tes_WIFI_Archive/dist/default/production/Tes_WIFI_Archive.production.map
+Test_WiFi_03.X/Tes_WIFI_Archive/nbproject/configurations.xml
+Test_WiFi_03.X/Tes_WIFI_Archive/nbproject/Makefile-default.mk
+Test_WiFi_03.X/Tes_WIFI_Archive/nbproject/Makefile-genesis.properties
+Test_WiFi_03.X/Tes_WIFI_Archive/nbproject/Makefile-impl.mk
+Test_WiFi_03.X/Tes_WIFI_Archive/nbproject/Makefile-local-default.mk
+Test_WiFi_03.X/Tes_WIFI_Archive/nbproject/Makefile-variables.mk
+Test_WiFi_03.X/Tes_WIFI_Archive/nbproject/Package-default.bash
+Test_WiFi_03.X/Tes_WIFI_Archive/nbproject/private/configurations.xml
+Test_WiFi_03.X/Tes_WIFI_Archive/nbproject/private/private.xml

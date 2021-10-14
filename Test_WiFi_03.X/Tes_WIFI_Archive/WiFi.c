@@ -540,21 +540,21 @@ void wifi( bool init )
 	    }
 
 	}
-	if( wifiResponseCheck( "+IPD,0,17:!Set;Lights;Off*", "null" ) == true || wifiResponseCheck( "+IPD,0,18:!Set;Lights;Off*", "null" ) == true )
+	if( wifiResponseCheck( "+IPD,0,23:!Set;Lights;Off%1320*", "null" ) == true || wifiResponseCheck( "+IPD,0,18:!Set;Lights;Off*", "null" ) == true )
 	{
 	    debugMode = 0;
 	    LED1SET = 0;
 	    LED2SET = 0;
 	    LED3SET = 0;
-//	    wifiCommandSet( "CIPCLOSE=0", true );
+	    wifiCommandSet( "CIPCLOSE=0", true );
 	}
 
 
-	if( wifiResponseCheck( "+IPD,0,16:!Set;Lights;On*", "null" ) == true || wifiResponseCheck( "+IPD,0,17:!Set;Lights;On*", "null" ) == true )
+	if( wifiResponseCheck( "+IPD,0,22:!Set;Lights;On%1226*", "null" ) == true || wifiResponseCheck( "+IPD,0,17:!Set;Lights;On*", "null" ) == true )
 	{
 	    debugMode = 1;
 	    LED1SET = 1;
-//	    wifiCommandSet( "CIPCLOSE=0", true );
+	    wifiCommandSet( "CIPCLOSE=0", true );
 
 	}
 

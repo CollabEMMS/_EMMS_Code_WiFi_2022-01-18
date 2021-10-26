@@ -602,7 +602,7 @@ void wifi( bool init )
         sendingCommand = 3;
 //        spiSendYes == true;
     }
-//    spiComm( );
+        spiComm( );
 	break;
     }
     case 20:

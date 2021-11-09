@@ -72,6 +72,7 @@ bool getBuffer = false;
 int counter = 0;
 int debugMode = 1; // 1 = off, 0 = on
 char wifiInfo[100] = "";
+char messageForJava[32] = "";
 char spiResponse[50] = "";
 //bool spiSendYes = false;
 int sendingCommand = 0;
@@ -540,6 +541,28 @@ void wifi( bool init )
 	    }
 
 	}
+        
+    if( wifiResponseCheck( "+IPD,0,12:!ping%430*", "null") == true || wifiResponseCheck( "+IPD,0,11:!ping%430*", "null") == true)
+    {
+      strcat( messageForJava, "Pong\n" );
+	    int messageForJavaLen = strlen( messageForJava );
+	    char len[5];
+	    itoa( len, messageForJavaLen, 10 );
+	    char sendAmount[20] = "CIPSEND=0,";
+	    strcat( sendAmount, len );
+	    wifiCommandSet( sendAmount, true );
+	    currentCommand = 5;
+        
+    } else if ( wifiResponseCheck( "OK", "null" ) == true)
+    {
+        if( currentCommand == 5)
+        {
+            wifiCommandSet(messageForJava, false);
+            currentCommand = 0;
+        }
+    }
+         
+        
 	if( wifiResponseCheck( "+IPD,0,23:!Set;Lights;Off%1320*", "null" ) == true || wifiResponseCheck( "+IPD,0,18:!Set;Lights;Off*", "null" ) == true )
 	{
 	    debugMode = 0;
